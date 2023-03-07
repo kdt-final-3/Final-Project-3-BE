@@ -24,13 +24,7 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew clean build
-
-  # application.properties 파일 생성
+      # application.properties 파일 생성
     - name: Make application-profile.properties
       run: |
         cd ./src/main/resources
@@ -45,6 +39,13 @@ jobs:
         mysql database: 'kdt3final' # 설정파일에 표시된 db명과 user, password
         mysql user: 'admin'
         mysql password: ${{ secrets.DATABASE_PASSWORD }}
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew clean build
+
 
 #디렉토리 생성
     - name: Make Directory
