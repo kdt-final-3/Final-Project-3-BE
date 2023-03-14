@@ -25,6 +25,14 @@ jobs:
         distribution: 'temurin'
 
       # application.properties 파일 생성
+    - name: Make application-redis.properties
+      run: |
+        cd ./src/main/resources
+        touch ./application-redis.properties
+
+        echo "${{ secrets.REDIS_PROPERTIES }}" >> ./application-redis.properties
+      shell: bash
+
     - name: Make application-profile.properties
       run: |
         cd ./src/main/resources
