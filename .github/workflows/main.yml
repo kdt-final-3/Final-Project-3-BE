@@ -3,9 +3,10 @@ name: salarying CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main , develop ]
   pull_request:
     branches: [ main ]
+
 
 env:
   S3_BUCKET_NAME: final-salarying-s3
