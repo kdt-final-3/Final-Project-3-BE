@@ -24,7 +24,7 @@ public class SecurityConfig {
     ===========================*/
     // 아래 URL은 권한검사X
     private static final String[] PUBLIC_URLS = {
-            "/signup", "/login", "/logout", "/userIdValidation"
+            "/signup", "/login", "/logout", "/userIdValidation","/test"
     };
 
     @Bean
