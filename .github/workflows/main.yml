@@ -45,7 +45,7 @@ jobs:
     - name: Setup MySQL
       uses: mirromutth/mysql-action@v1.1
       with:
-        mysql database: 'cardmonkey'
+        mysql database: 'kdt3final'
         mysql user: 'admin'
         mysql password: ${{ secrets.DATABASE_PASSWORD }}
 
