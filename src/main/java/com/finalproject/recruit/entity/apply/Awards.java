@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -27,7 +28,7 @@ public class Awards {
     private String awardsName;
 
     @Column(name = "awards_date")
-    private Date awardsDate;
+    private LocalDateTime awardsDate;
 
     @Column(name = "awards_company")
     private String awardsCompany;

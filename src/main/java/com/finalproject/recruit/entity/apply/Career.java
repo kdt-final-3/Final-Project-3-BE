@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -28,10 +29,10 @@ public class Career {
     private String careerName;
 
     @Column(name = "career_start")
-    private Date careerStart;
+    private LocalDateTime careerStart;
 
     @Column(name = "career_end")
-    private Date careerEnd;
+    private LocalDateTime careerEnd;
 
     @Column(name = "career_detail")
     private String careerDetail;

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -30,9 +31,9 @@ public class Activities {
     private String activitiesContent;
 
     @Column(name = "activities_start")
-    private Date activitiesStart;
+    private LocalDateTime activitiesStart;
 
     @Column(name = "activities_end")
-    private Date activitiesEnd;
+    private LocalDateTime activitiesEnd;
 
 }

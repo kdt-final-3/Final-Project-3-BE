@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -41,9 +42,9 @@ public class Education {
     private EduStatus eduStatus;
 
     @Column(name = "edu_start")
-    private Date eduStart;
+    private LocalDateTime eduStart;
 
     @Column(name = "edu_end")
-    private Date eduEnd;
+    private LocalDateTime eduEnd;
 
 }

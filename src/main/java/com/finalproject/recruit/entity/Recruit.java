@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -37,13 +38,13 @@ public class Recruit {
      * 채용 시작 날짜
      */
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDateTime startDate;
 
     /**
      * 채용 마감 일자
      */
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDateTime endDate;
 
     /**
      * 삭제 여부

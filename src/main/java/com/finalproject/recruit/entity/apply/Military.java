@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -27,10 +28,10 @@ public class Military {
     private Apply apply;
 
     @Column(name = "military_start")
-    private Date militaryStart;
+    private LocalDateTime militaryStart;
 
     @Column(name = "military_end")
-    private Date militaryEnd;
+    private LocalDateTime militaryEnd;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "military_division")
