@@ -57,13 +57,19 @@ public class Recruit {
     @Column(name = "recruit_procedure")
     private String recruitProcedure;
 
-
     /**
-     * 템플릿 연결
+     * 기업연결 - 여러 채용공고가 하나의 기업과 연결되어 있을 수 있음
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_code")
-    private Template template;
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    /**
+     * 기준 키워드
+     */
+    @Column(name = "keyword_standard")
+    private String keywordStandard;
+
 
 
 
