@@ -20,8 +20,8 @@ public class Member {
      * 기업회원 아이디
      */
     @Id
-    @Column(name = "member_id")
-    private String memberId;
+    @Column(name = "member_email")
+    private String memberEmail;
 
     /**
      * 기업 비밀번호
@@ -38,8 +38,8 @@ public class Member {
     /**
      * 사업자 등록번호
      */
-    @Column(name = "company_number")
-    private String companyNumber;
+    @Column(name = "company_num")
+    private String companyNum;
 
     /**
      * 기업명
