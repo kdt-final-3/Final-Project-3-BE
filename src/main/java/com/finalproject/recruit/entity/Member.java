@@ -53,5 +53,9 @@ public class Member {
     @Column(name = "ceo_name")
     private String ceoName;
 
-
+    /**
+     * 탈퇴여부
+     */
+    @Column(name = "member_delete")
+    private boolean memberDelete;
 }
