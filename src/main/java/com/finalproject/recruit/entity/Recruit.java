@@ -20,7 +20,7 @@ public class Recruit {
      * 채용공고 ID
      */
     @Id
-    @Column(name = "posting_id")
+    @Column(name = "recruit_id")
     private Long recruitId;
 
     /**
@@ -71,8 +71,6 @@ public class Recruit {
      */
     @Column(name = "goal")
     private LocalDateTime goal;
-
-
 
     /**
      * 삭제 여부

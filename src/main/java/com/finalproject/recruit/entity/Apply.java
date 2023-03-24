@@ -32,7 +32,7 @@ public class Apply extends BaseTime {
      * 채용공고 연결
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "posting_id")
+    @JoinColumn(name = "recruit_id")
     private Recruit recruit;
 
     /**
