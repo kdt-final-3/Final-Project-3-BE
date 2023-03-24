@@ -84,6 +84,16 @@ public class Apply extends BaseTime {
     @Column(name = "apply_delete")
     private boolean applyDelete;
 
+    /**
+     * 자기소개서 내용
+     */
+    @Column(name = "resume_content")
+    private String resumeContent;
 
+    /**
+     * 찜
+     */
+    @Column(name = "like")
+    private boolean like;
 
 }
