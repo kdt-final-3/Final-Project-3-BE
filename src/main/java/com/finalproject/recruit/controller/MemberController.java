@@ -52,4 +52,12 @@ public class MemberController {
     public ResponseEntity<?> validateEmail(@RequestBody MemberReqDTO.EmailValidate emailValidate) {
         return memberService.existEmail(emailValidate.getMemberEmail());
     }
+
+    /**
+     * 비밀번호 재설정
+     */
+    @PutMapping("/auth/reset_password")
+    public ResponseEntity<?> resetPassword(@RequestBody MemberReqDTO.ResetPassword resetPassword) {
+        return memberService.resetPassword(resetPassword);
+    }
 }
