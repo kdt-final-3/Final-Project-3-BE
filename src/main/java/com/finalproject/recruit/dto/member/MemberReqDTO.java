@@ -47,7 +47,7 @@ public class MemberReqDTO {
         }
 
     }
-    
+
     /**
      * 이메일 중복 체크 요청 DTO
      */
@@ -56,6 +56,21 @@ public class MemberReqDTO {
     public static class EmailValidate {
 
         private String memberEmail;
+
+    }
+
+    /**
+     * 비밀번호 재설정 요청 DTO
+     */
+    @Getter
+    @Setter
+    public static class ResetPassword {
+
+        private String memberEmail;
+
+        private String newPassword;
+
+        private String passwordCheck;
 
     }
 }
