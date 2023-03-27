@@ -30,7 +30,7 @@ public class MemberReqDTO {
         private String ceoName;
 
     }
-    
+
     /**
      * 로그인 요청 DTO
      */
@@ -45,6 +45,17 @@ public class MemberReqDTO {
         public UsernamePasswordAuthenticationToken toAuthentication() {
             return new UsernamePasswordAuthenticationToken(memberEmail, password);
         }
+
+    }
+    
+    /**
+     * 이메일 중복 체크 요청 DTO
+     */
+    @Getter
+    @Setter
+    public static class EmailValidate {
+
+        private String memberEmail;
 
     }
 }
