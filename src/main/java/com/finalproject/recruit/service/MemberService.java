@@ -2,6 +2,7 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.member.MemberReqDTO;
+import com.finalproject.recruit.dto.member.MemberResDTO;
 import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.jwt.JwtTokenProvider;
 import com.finalproject.recruit.repository.MemberRepository;
@@ -9,9 +10,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +55,26 @@ public class MemberService {
                 .build();
         memberRepo.save(member);
         return response.success("회원가입에 성공하였습니다.");
+    }
+
+    /**
+     * 로그인
+     */
+    public ResponseEntity<?> login(MemberReqDTO.Login login) {
+        Member member = memberRepo.findByMemberEmail(login.getMemberEmail()).orElse(null);
+        if (member == null) {
+            return response.fail("해당되는 유저가 존재하지 않습니다.");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken = login.toAuthentication();
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        MemberResDTO.TokenInfo tokenInfo = provider.generateToken(authentication);
+
+        redisTemplate.opsForValue()
+                .set("RT : " + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        return response.success(tokenInfo, "로그인에 성공하셨습니다.", HttpStatus.OK);
     }
 }
