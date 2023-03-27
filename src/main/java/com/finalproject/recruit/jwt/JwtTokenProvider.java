@@ -1,6 +1,6 @@
 package com.finalproject.recruit.jwt;
 
-import com.finalproject.recruit.dto.UserResDTO;
+import com.finalproject.recruit.dto.member.MemberResDTO;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +32,7 @@ public class JwtTokenProvider {
     /**
      * 유저 정보를 가지고 AccessToken, RereshToken을 생성하는 메소드
      */
-    public UserResDTO.TokenInfo generateToken(Authentication authentication) {
+    public MemberResDTO.TokenInfo generateToken(Authentication authentication) {
         //권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -53,7 +53,7 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
-        return UserResDTO.TokenInfo.builder()
+        return MemberResDTO.TokenInfo.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

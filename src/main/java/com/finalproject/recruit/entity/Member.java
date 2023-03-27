@@ -2,6 +2,7 @@ package com.finalproject.recruit.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -11,6 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "member")
@@ -53,5 +55,9 @@ public class Member {
     @Column(name = "ceo_name")
     private String ceoName;
 
-
+    /**
+     * 탈퇴여부
+     */
+    @Column(name = "member_delete")
+    private boolean memberDelete;
 }
