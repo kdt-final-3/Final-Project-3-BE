@@ -73,4 +73,19 @@ public class MemberReqDTO {
         private String passwordCheck;
 
     }
+
+    /**
+     * 기업 정보 변경 요청 DTO
+     */
+    @Getter
+    @Setter
+    public static class Edit {
+
+        private String password;
+
+        private String memberPhone;
+
+        private String ceoName;
+
+    }
 }

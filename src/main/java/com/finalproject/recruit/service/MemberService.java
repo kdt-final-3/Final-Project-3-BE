@@ -156,4 +156,23 @@ public class MemberService {
                 : response.fail("다시 시도해주세요");
 
     }
+
+    /**
+     * 사용자 정보 변경
+     */
+    public ResponseEntity<?> editInfo(String accessToken, MemberReqDTO.Edit edit) {
+        Integer result = null;
+        String email = provider.getAuthentication(accessToken).getName();
+
+        try {
+            result = memberRepo.updateInfo(edit.getPassword(), edit.getMemberPhone(), edit.getCeoName(), email);
+        }
+        catch (Exception e) {
+            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        return result > 0?
+                response.success("변경에 성공하였습니다.") :
+                response.fail("다시 시도해주세요");
+    }
 }
