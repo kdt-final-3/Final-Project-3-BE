@@ -126,4 +126,11 @@ public class MemberService {
 
         return response.success(tokenInfo, "갱신하였습니다.", HttpStatus.OK);
     }
+
+    public ResponseEntity<?> existEmail(String email) {
+        return memberRepo.existsByMemberEmail(email)?
+                response.success("가입 가능한 이메일입니다."):
+                response.fail("이미 가입된 이메일입니다.");
+
+    }
 }
