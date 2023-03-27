@@ -133,4 +133,27 @@ public class MemberService {
                 response.fail("이미 가입된 이메일입니다.");
 
     }
+
+    /**
+     * 비밀번호 재설정
+     */
+    public ResponseEntity<?> resetPassword(MemberReqDTO.ResetPassword passwordInfo) {
+        Member member = memberRepo.findByMemberEmail(passwordInfo.getMemberEmail()).orElse(null);
+
+        if (member == null) {
+            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
+        }
+        Integer result = null;
+        try {
+            result = memberRepo.resetPassword(passwordInfo.getMemberEmail(), passwordInfo.getNewPassword());
+        }
+        catch (Exception e) {
+            return response.fail("다시 시도해주세요", HttpStatus.BAD_REQUEST);
+        }
+
+        return result > 0?
+                response.success("성공하였습니다.")
+                : response.fail("다시 시도해주세요");
+
+    }
 }
