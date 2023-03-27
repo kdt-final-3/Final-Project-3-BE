@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -174,5 +175,26 @@ public class MemberService {
         return result > 0?
                 response.success("변경에 성공하였습니다.") :
                 response.fail("다시 시도해주세요");
+    }
+
+    /**
+     * 회원탈퇴
+     */
+    @Transactional
+    public ResponseEntity<?> signOut(String accessToken) {
+
+        String email = provider.getAuthentication(accessToken).getName();
+
+        try {
+            memberRepo.changeMemberStatus(email);
+        }
+        catch (NullPointerException e) {
+            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
+        }
+        catch (IllegalArgumentException e) {
+            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
+        }
+        return response.success();
+
     }
 }
