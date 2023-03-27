@@ -68,4 +68,12 @@ public class MemberController {
     public ResponseEntity<?> editInfo(@RequestHeader("Authorization") String accessToken, @RequestBody MemberReqDTO.Edit edit) {
         return memberService.editInfo(accessToken, edit);
     }
+
+    /**
+     * 회원탈퇴
+     */
+    @PutMapping("/edit/delete")
+    public ResponseEntity<?> signOut(@RequestHeader("Authorization") String accessToken) {
+        return memberService.signOut(accessToken);
+    }
 }
