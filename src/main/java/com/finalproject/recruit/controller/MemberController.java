@@ -60,4 +60,12 @@ public class MemberController {
     public ResponseEntity<?> resetPassword(@RequestBody MemberReqDTO.ResetPassword resetPassword) {
         return memberService.resetPassword(resetPassword);
     }
+
+    /**
+     * 회원 정보 변경
+     */
+    @PutMapping("/edit")
+    public ResponseEntity<?> editInfo(@RequestHeader("Authorization") String accessToken, @RequestBody MemberReqDTO.Edit edit) {
+        return memberService.editInfo(accessToken, edit);
+    }
 }
