@@ -77,4 +77,28 @@ public class MemberService {
 
         return response.success(tokenInfo, "로그인에 성공하셨습니다.", HttpStatus.OK);
     }
+    /**
+     * 로그아웃
+     */
+    public ResponseEntity<?> logout(String accessToken) {
+
+        if (!provider.validateToken(accessToken)) {
+            return response.fail("잘못된 요청입니다.");
+        }
+
+        Authentication authentication = provider.getAuthentication(accessToken);
+
+        if (redisTemplate.opsForValue().get("RT : " + authentication.getName()) != null) {
+            redisTemplate.delete("RT : " + authentication.getName());
+        }
+
+        Long expireTime = provider.getExpiration(accessToken);
+
+        redisTemplate.opsForValue()
+                .set(accessToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+
+        return response.success("로그아웃 되셨습니다.");
+
+
+    }
 }
