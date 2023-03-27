@@ -1,5 +1,6 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.member.MemberReqDTO;
 import com.finalproject.recruit.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,13 @@ public class MemberController {
     @PostMapping("/auth/signup")
     public ResponseEntity<?> signUp(@RequestBody MemberReqDTO.SignUp signUp) {
         return memberService.signUp(signUp);
+    }
+
+    /**
+     * 로그인
+     */
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody MemberReqDTO.Login login) {
+        return memberService.login(login);
     }
 }
