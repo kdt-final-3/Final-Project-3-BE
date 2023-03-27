@@ -39,4 +39,12 @@ public class MemberController {
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken) {
         return memberService.logout(accessToken);
     }
+
+    /**
+     * 토큰 기한 연장
+     */
+    @PostMapping("/auth/reissue")
+    public ResponseEntity<?> reissue(@RequestHeader("Authorization") String accessToken) {
+        return memberService.reissue(accessToken);
+    }
 }
