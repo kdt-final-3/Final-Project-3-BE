@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -100,5 +101,29 @@ public class MemberService {
         return response.success("로그아웃 되셨습니다.");
 
 
+    }
+
+    /**
+     * 토큰 기한 연장
+     */
+    public ResponseEntity<?> reissue(String accessToken) {
+        if (!provider.validateToken(accessToken)) {
+            return response.fail("RefreshToken의 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        Authentication authentication = provider.getAuthentication(accessToken);
+
+        String refreshToken = (String)redisTemplate.opsForValue().get("RT : " + authentication.getName());
+
+        if (ObjectUtils.isEmpty(refreshToken)) {
+            return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        MemberResDTO.TokenInfo tokenInfo = provider.generateToken(authentication);
+
+        redisTemplate.opsForValue()
+                .set("RT : " + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        return response.success(tokenInfo, "갱신하였습니다.", HttpStatus.OK);
     }
 }
