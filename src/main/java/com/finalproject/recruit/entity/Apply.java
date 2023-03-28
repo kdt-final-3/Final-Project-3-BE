@@ -60,6 +60,12 @@ public class Apply extends BaseTime {
     private String applyPortfolio;
 
     /**
+     * 기타 이력서
+     */
+    @Column(name = "apply_resume")
+    private String applyResume;
+
+    /**
      * 채용 절차
      */
     @Column(name = "apply_procedure")

@@ -2,6 +2,7 @@ package com.finalproject.recruit.entity.apply;
 
 
 import com.finalproject.recruit.entity.Apply;
+import com.finalproject.recruit.parameter.LanguageLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -29,9 +30,8 @@ public class Language {
     @Column(name = "language_skill")
     private String languageSkill;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "language_level")
-    private String languageLevel;
-
-    @Column(name = "language_date")
-    private String languageDate;
+    private LanguageLevel languageLevel;
+    
 }
