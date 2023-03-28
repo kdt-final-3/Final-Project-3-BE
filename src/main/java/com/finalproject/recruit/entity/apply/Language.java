@@ -33,7 +33,5 @@ public class Language {
     @Enumerated(EnumType.STRING)
     @Column(name = "language_level")
     private LanguageLevel languageLevel;
-
-    @Column(name = "language_date")
-    private String languageDate;
+    
 }
