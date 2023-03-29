@@ -4,6 +4,7 @@ import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.entity.apply.*;
 import com.finalproject.recruit.jisoo.parameter.Keywords;
+
 import com.finalproject.recruit.parameter.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,8 +22,14 @@ public class ApplicationReq {
         private String applyName;
         private String applyPhone;
         private String applyEmail;
+
+      //  private Long applyId;
+
         private String resumeContent;
         private String applyPortfolio;
+
+        private String applyResume;
+
         private List<Boolean> keywordsReq;
 
         private String eduName;
@@ -53,8 +60,7 @@ public class ApplicationReq {
 
         private String languageName;
         private String languageSkill;
-        private String languageLevel;
-        private LocalDateTime languageDate;
+        private LanguageLevel languageLevel;
 
         private LocalDateTime militaryStart;
         private LocalDateTime militaryEnd;
@@ -62,6 +68,21 @@ public class ApplicationReq {
         private MilitaryCategory militaryCategory;
         private MilitaryClass militaryClass;
         private String militaryExemption;
+
+
+        public Apply toApply(Recruit recruit){
+                return Apply.builder()
+                        .recruit(recruit)
+                        .applyName(applyName)
+                        .applyPhone(applyPhone)
+                        .applyEmail(applyEmail)
+                        .resumeContent(resumeContent)
+                        .applyPortfolio(applyPortfolio)
+                        .applyResume(applyResume)
+                        .keywordSelect(keywordToString(keywordsReq))
+                        .build();
+        }
+
 
         public String keywordToString(List<Boolean> req){
                 String result = "";
@@ -72,18 +93,6 @@ public class ApplicationReq {
                         }
                 }
                 return result;
-        }
-
-        public Apply toApply(Recruit recruit){
-                return Apply.builder()
-                        .recruit(recruit)
-                        .applyName(applyName)
-                        .applyPhone(applyPhone)
-                        .applyEmail(applyEmail)
-                        .resumeContent(resumeContent)
-                        .applyPortfolio(applyPortfolio)
-                        .keywordSelect(keywordToString(keywordsReq))
-                        .build();
         }
 
         public Activities toActivities(Apply apply){
@@ -136,12 +145,13 @@ public class ApplicationReq {
         }
 
         public Language toLanguage(Apply apply){
+                System.out.println("이거는?");
+                System.out.println(languageLevel);
                 return Language.builder()
                         .apply(apply)
                         .languageName(languageName)
                         .languageSkill(languageSkill)
                         .languageLevel(languageLevel)
-                        .languageDate(languageDate)
                         .build();
         }
 

@@ -16,4 +16,6 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     List<Apply> findByRecruitRecruitIdAndApplyDeleteIsTrue(Long recruitId);
 
+    boolean existsApplyByApplyEmailAndRecruitRecruitId(String email,Long recruitId);
+
 }

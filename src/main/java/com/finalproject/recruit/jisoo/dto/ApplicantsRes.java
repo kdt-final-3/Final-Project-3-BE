@@ -22,7 +22,7 @@ public class ApplicantsRes {
      private String applyEmail;
      private ApplyProcedure applyProcedure;
      private Boolean applyDelete;
-     private Boolean pass;
+     private Boolean failApply;
      private Boolean wish;
      private LocalDateTime createdTime;
      private LocalDateTime recentMessageTime;
@@ -35,7 +35,7 @@ public class ApplicantsRes {
                   .applyEmail(apply.getApplyEmail())
                   .applyProcedure(apply.getApplyProcedure())
                   .applyDelete(apply.isApplyDelete())
-                  .pass(apply.isPass())
+                  .failApply(apply.isFailApply())
                   .wish(apply.isWish())
                   .createdTime(apply.getCreatedTime())
                   .recentMessageTime(recentMessageTime)
