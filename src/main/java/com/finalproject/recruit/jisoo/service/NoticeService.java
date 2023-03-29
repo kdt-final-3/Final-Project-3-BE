@@ -1,5 +1,6 @@
 package com.finalproject.recruit.jisoo.service;
 
+import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.jisoo.Mail;
@@ -9,6 +10,8 @@ import com.finalproject.recruit.jisoo.repository.ApplyRepository;
 import com.finalproject.recruit.jisoo.repository.MailRepository;
 import com.finalproject.recruit.jisoo.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,15 +25,18 @@ public class NoticeService {
     private final RecruitRepository recruitRepository;
     private final MailRepository mailRepository;
 
-    public List<NoticeRecruitsRes> recruitList(String memberEmail) {
-        return recruitRepository.findByMemberMemberEmail(memberEmail).stream()
+    private final Response response;
+
+    public ResponseEntity<?> recruitList(String memberEmail) {
+        List<NoticeRecruitsRes> noticeRecruitsRes = recruitRepository.findByMemberMemberEmail(memberEmail).stream()
                 .map(NoticeRecruitsRes::fromRecruit)
                 .collect(Collectors.toList());
+        return response.success(noticeRecruitsRes);
     }
 
-    public List<ApplicantsRes> applicantList(Long recruitId) {
+    public ResponseEntity<?> applicantList(Long recruitId) {
 
-        return applyRepository.findByRecruitRecruitId(recruitId)
+        List<ApplicantsRes> applicantsRes = applyRepository.findByRecruitRecruitId(recruitId)
                 .stream()
                 .map(apply -> ApplicantsRes.fromApply(
                         apply,
@@ -38,28 +44,30 @@ public class NoticeService {
                                 .map(Mail::getCreatedTime)
                                 .orElse(null)))
                 .collect(Collectors.toList());
+        return response.success(applicantsRes);
 
     }
 
-    public List<MessageHistoryRes> messageHistory(Long recruitId) {
-        return mailRepository.findByRecruitRecruitId(recruitId)
+    public ResponseEntity<?> messageHistory(Long recruitId) {
+        List<MessageHistoryRes> messageHistoryRes = mailRepository.findByRecruitRecruitId(recruitId)
                 .stream()
                 .map(mail -> MessageHistoryRes.fromEntity(
                         mail,
                         mail.getApply()
                 ))
                 .collect(Collectors.toList());
+        return response.success(messageHistoryRes);
     }
 
-    public String sendEmail(EmailReq emailReq) {
+    public ResponseEntity<?> sendEmail(EmailReq emailReq) {
         try {
             Apply apply = applyRepository.findByApplyId(emailReq.getApplyId()).orElseThrow(()-> new IllegalArgumentException("지원자가 존재하지 않습니다."));
             Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
             String message=emailReq.getMailContent(); //보낼 메시지
             String recipient = apply.getApplyEmail(); //받는 사람 (이메일)
-            if (emailReq.getNoticeStep().equals(NoticeStep.면접제안)) {
-                message+="면접 날짜는 "+ emailReq.getInterviewDate()+"입니다.\n"+
-                    "잘 준비하셔서 좋은 성과 있으시길 바랍니다.\n";
+            if (emailReq.getNoticeStep() == NoticeStep.면접제안) {
+                message+="면접 날짜는 "+ emailReq.getInterviewDate()+"입니다."+
+                    "잘 준비하셔서 좋은 성과 있으시길 바랍니다.";
             }
             message+="감사합니다. ";
             //이메일 전송!!
@@ -75,21 +83,21 @@ public class NoticeService {
                     .build();
             mailRepository.save(mail);
 
-            return "success";
+            return response.success("이메일이 전송되었습니다.");
 
         } catch (Exception e){
-            return "fail";
+            return response.fail("이메일 전송에 실패하였습니다.");
         }
     }
 
-    public String selectStep(SelectStepReq selectStepReq) {
+    public ResponseEntity<?> selectStep(SelectStepReq selectStepReq) {
         Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(selectStepReq.getRecruitId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
 
-        String message = "안녕하세요. "+ recruit.getMember().getCompanyName()+"입니다.\n" +
-                "저희 "+ recruit.getRecruitTitle()+"에 관심을 가지고 지원해 주셔서 감사합니다.\n";
+        String message = "안녕하세요. "+ recruit.getMember().getCompanyName()+"입니다. "+
+                "저희 "+ recruit.getRecruitTitle()+"에 관심을 가지고 지원해 주셔서 감사합니다. ";
         message+=selectStepReq.getNoticeStep().getMessage();
 
-        return message;
+        return response.success(message, "success", HttpStatus.OK);
     }
 }
