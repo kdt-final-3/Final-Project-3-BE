@@ -17,6 +17,10 @@ import java.util.stream.Collectors;
 @Setter
 @Builder
 public class ApplicantsRes {
+     private Long recruitId;
+     private String  recruitTitle;
+
+     private Long applyId;
      private String applyName;
      private String applyPhone;
      private String applyEmail;
@@ -30,6 +34,9 @@ public class ApplicantsRes {
 
      public static ApplicantsRes fromApply(Apply apply , LocalDateTime recentMessageTime){
           return ApplicantsRes.builder()
+                  .recruitId(apply.getRecruit().getRecruitId())
+                  .recruitTitle(apply.getRecruit().getRecruitTitle())
+                  .applyId(apply.getApplyId())
                   .applyName(apply.getApplyName())
                   .applyPhone(apply.getApplyPhone())
                   .applyEmail(apply.getApplyEmail())
