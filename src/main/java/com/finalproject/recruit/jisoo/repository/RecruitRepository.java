@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface RecruitRepository extends JpaRepository<Recruit, Long> {
 
-    Optional<Recruit> findTopByRecruitDeleteIsFalseOrderByCreatedTimeDesc();
+    Optional<Recruit> findTopByRecruitDeleteIsFalseAndMemberMemberEmailOrderByCreatedTimeDesc(String email);
 
     Optional<Recruit> findByRecruitIdAndRecruitDeleteIsFalse(Long recruitId);
 
