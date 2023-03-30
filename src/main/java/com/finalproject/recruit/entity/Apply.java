@@ -1,6 +1,6 @@
 package com.finalproject.recruit.entity;
 
-import com.finalproject.recruit.jisoo.parameter.MilitaryEnum;
+import com.finalproject.recruit.parameter.MilitaryEnum;
 import com.finalproject.recruit.parameter.ApplyProcedure;
 import com.finalproject.recruit.util.BaseTime;
 import lombok.AllArgsConstructor;
