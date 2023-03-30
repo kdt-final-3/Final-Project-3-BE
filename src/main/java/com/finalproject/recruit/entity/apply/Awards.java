@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class Awards {
 
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "awards_id")
     private Long awardsId;
 
