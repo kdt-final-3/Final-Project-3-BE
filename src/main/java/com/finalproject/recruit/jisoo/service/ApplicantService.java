@@ -3,8 +3,8 @@ package com.finalproject.recruit.jisoo.service;
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
-import com.finalproject.recruit.jisoo.dto.ApplicantInfoReq;
 import com.finalproject.recruit.jisoo.dto.ApplicationReq;
+import com.finalproject.recruit.jisoo.dto.PreRequired;
 import com.finalproject.recruit.jisoo.repository.ApplyRepository;
 import com.finalproject.recruit.jisoo.repository.RecruitRepository;
 import com.finalproject.recruit.jisoo.repository.apply.*;
@@ -56,15 +56,17 @@ public class ApplicantService {
 
     }
 
-    public Long postInfo(ApplicantInfoReq applicantInfoReq) {
-        Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(applicantInfoReq.getRecruitId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다.")
-        );
-        Apply apply = applyRepository.save(applicantInfoReq.toApply(recruit));
-        return apply.getApplyId();
-    }
-
     public Boolean checkEmail(String email, Long recruitId) {
         return !applyRepository.existsApplyByApplyEmailAndRecruitRecruitId(email, recruitId);
+    }
+
+    public ResponseEntity<?> preRequired(Long recruitId) {
+        Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(recruitId).orElse(null);
+        if (recruit == null) {
+            return response.fail("채용공고가 존재하지 않습니다.");
+        }
+
+        PreRequired preRequired = PreRequired.fromRecruit(recruit);
+        return response.success(preRequired);
     }
 }

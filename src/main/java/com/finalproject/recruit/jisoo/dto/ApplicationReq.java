@@ -5,6 +5,7 @@ import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.entity.apply.*;
 import com.finalproject.recruit.jisoo.parameter.Keywords;
 
+import com.finalproject.recruit.jisoo.parameter.MilitaryEnum;
 import com.finalproject.recruit.parameter.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,16 @@ public class ApplicationReq {
         private String applyResume;
 
         private List<Boolean> keywordsReq;
+
+        /**
+         * 우대사항 관련
+         * */
+        private boolean disorder;
+        private boolean veteran;
+        private boolean employment;
+        private boolean terms;
+        private MilitaryEnum militaryEnum;
+
 
         private String eduName;
         private EduYear eduYear;
@@ -80,6 +91,11 @@ public class ApplicationReq {
                         .applyPortfolio(applyPortfolio)
                         .applyResume(applyResume)
                         .keywordSelect(keywordToString(keywordsReq))
+                        .disorder(disorder)
+                        .veteran(veteran)
+                        .employment(employment)
+                        .terms(terms)
+                        .militaryEnum(militaryEnum)
                         .build();
         }
 

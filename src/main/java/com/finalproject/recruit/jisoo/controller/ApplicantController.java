@@ -1,7 +1,6 @@
 package com.finalproject.recruit.jisoo.controller;
 
 import com.finalproject.recruit.dto.Response;
-import com.finalproject.recruit.jisoo.dto.ApplicantInfoReq;
 import com.finalproject.recruit.jisoo.dto.ApplicationReq;
 import com.finalproject.recruit.jisoo.service.ApplicantService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,6 @@ public class ApplicantController {
 
 
 
-    @PostMapping("/submit/info")
-    public Long postInfo(@RequestBody ApplicantInfoReq applicantInfoReq){
-        return applicantService.postInfo(applicantInfoReq);
-    }
 
     /**
      * 지원자의 지원서 제출
@@ -38,6 +33,14 @@ public class ApplicantController {
     @GetMapping("/check/{recruitId}")
     public ResponseEntity<?> checkEmail(@RequestParam String email, @PathVariable Long recruitId){
         return response.success(applicantService.checkEmail(email, recruitId));
+    }
+
+    /**
+     * 사전에 뿌릴 정보 조회
+     * */
+    @GetMapping("/{recruitId}")
+    public ResponseEntity<?> preRequired(@PathVariable Long recruitId){
+        return applicantService.preRequired(recruitId);
     }
 
 }
