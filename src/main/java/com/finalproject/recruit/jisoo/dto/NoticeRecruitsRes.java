@@ -14,7 +14,6 @@ public class NoticeRecruitsRes {
         private Long recruitId;
         private String recruitTitle;
         private String recruitProcedure;
-        private Boolean recruitClose;
         private LocalDateTime createdTime;
 
         public static NoticeRecruitsRes fromRecruit(Recruit recruit){
@@ -22,7 +21,6 @@ public class NoticeRecruitsRes {
                     .recruitId(recruit.getRecruitId())
                     .recruitTitle(recruit.getRecruitTitle())
                     .recruitProcedure(recruit.getRecruitProcedure())
-                    .recruitClose(recruit.isRecruitClose())
                     .createdTime(recruit.getCreatedTime())
                     .build();
 
