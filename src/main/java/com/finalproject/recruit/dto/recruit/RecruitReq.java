@@ -1,10 +1,6 @@
-package com.finalproject.recruit.dto.Recruit;
+package com.finalproject.recruit.dto.recruit;
 
-import com.finalproject.recruit.entity.recruit.Recruit;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Getter @Setter
 @NoArgsConstructor

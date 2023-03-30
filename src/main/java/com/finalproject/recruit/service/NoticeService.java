@@ -66,7 +66,7 @@ public class NoticeService {
     public ResponseEntity<?> sendEmail(EmailReq emailReq) {
         try {
             Apply apply = applyRepository.findByApplyId(emailReq.getApplyId()).orElseThrow(()-> new IllegalArgumentException("지원자가 존재하지 않습니다."));
-            Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
+            Recruit recruit = recruitRepository.findByRecruitId(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
             String message=emailReq.getMailContent(); //보낼 메시지
             String recipient = apply.getApplyEmail(); //받는 사람 (이메일)
             if (emailReq.getNoticeStep() == NoticeStep.면접제안) {
@@ -95,7 +95,7 @@ public class NoticeService {
     }
 
     public ResponseEntity<?> selectStep(SelectStepReq selectStepReq) {
-        Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(selectStepReq.getRecruitId())
+        Recruit recruit = recruitRepository.findByRecruitId(selectStepReq.getRecruitId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
 
         String message = "안녕하세요. "+ recruit.getMember().getCompanyName()+"입니다. "+

@@ -1,7 +1,7 @@
-package com.finalproject.recruit.dto.Recruit;
+package com.finalproject.recruit.dto.recruit;
 
-import com.finalproject.recruit.entity.recruit.Recruit;
-import com.finalproject.recruit.repository.recruit.RecruitRepository;
+import com.finalproject.recruit.entity.Recruit;
+import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.*;
 
 import java.time.LocalDateTime;

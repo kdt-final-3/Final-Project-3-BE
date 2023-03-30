@@ -15,38 +15,30 @@ import java.util.List;
 public class PreRequired {
 
     private Long recruitId;
-
     private String recruitTitle;
-
     private String recruitContent;
-
-    private LocalDateTime startDate;
-
-    private LocalDateTime endDate;
-
-    private LocalDateTime meetStart;
-
-    private LocalDateTime meetEnd;
-
-    private LocalDateTime goal;
-
     private String resumeTitle;
-
     private List<Keywords> keywords;
+    private LocalDateTime docsStart;
+    private LocalDateTime docsEnd;
+    private LocalDateTime meetStart;
+    private LocalDateTime meetEnd;
+    private LocalDateTime confirmStart;
+    private LocalDateTime confirmEnd;
 
     public static PreRequired fromRecruit(Recruit recruit) {
         return PreRequired.builder()
                 .recruitId(recruit.getRecruitId())
                 .recruitTitle(recruit.getRecruitTitle())
                 .recruitContent(recruit.getRecruitContent())
-                .startDate(recruit.getStartDate())
-                .endDate(recruit.getEndDate())
-                .meetStart(recruit.getMeetStart())
-                .meetEnd(recruit.getMeetEnd())
-                .goal(recruit.getGoal())
                 .resumeTitle(recruit.getResumeTitle())
                 .keywords(List.of(Keywords.values()))
+                .docsStart(recruit.getDocsStart())
+                .docsEnd(recruit.getDocsEnd())
+                .meetStart(recruit.getMeetStart())
+                .meetEnd(recruit.getMeetEnd())
+                .confirmStart(recruit.getConfirmStart())
+                .confirmEnd(recruit.getConfirmEnd())
                 .build();
     }
-
 }

@@ -14,14 +14,14 @@ public class NoticeRecruitsRes {
         private Long recruitId;
         private String recruitTitle;
         private String recruitProcedure;
-        private LocalDateTime createdTime;
+        private LocalDateTime recruitRegistedAt;
 
         public static NoticeRecruitsRes fromRecruit(Recruit recruit){
             return NoticeRecruitsRes.builder()
                     .recruitId(recruit.getRecruitId())
                     .recruitTitle(recruit.getRecruitTitle())
                     .recruitProcedure(recruit.getRecruitProcedure())
-                    .createdTime(recruit.getCreatedTime())
+                    .recruitRegistedAt(recruit.getRecruitRegistedAt())
                     .build();
 
         }

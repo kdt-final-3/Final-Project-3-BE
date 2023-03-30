@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,12 +17,13 @@ public class RecentRecruitRes {
        private String recruitContent;
        private String recruitProcedure;
        private String keywordStandard; //배열로
-       private LocalDateTime startDate;
-       private LocalDateTime endDate;
+       private LocalDateTime docsStart;
+       private LocalDateTime docsEnd;
        private LocalDateTime meetStart;
        private LocalDateTime meetEnd;
-       private LocalDateTime goal;
-       private LocalDateTime createdTime;
+       private LocalDateTime confirmStart;
+       private LocalDateTime confirmEnd;
+       private LocalDateTime recruitRegistedAt;
 
        public static RecentRecruitRes fromRecruit(Recruit recruit){
               return RecentRecruitRes.builder()
@@ -30,12 +32,13 @@ public class RecentRecruitRes {
                       .recruitContent(recruit.getRecruitContent())
                       .recruitProcedure(recruit.getRecruitProcedure())
                       .keywordStandard(recruit.getKeywordStandard())
-                      .startDate(recruit.getStartDate())
-                      .endDate(recruit.getEndDate())
+                      .docsStart(recruit.getDocsStart())
+                      .docsEnd(recruit.getDocsEnd())
                       .meetStart(recruit.getMeetStart())
                       .meetEnd(recruit.getMeetEnd())
-                      .goal(recruit.getGoal())
-                      .createdTime(recruit.getCreatedTime())
+                      .confirmStart(recruit.getConfirmStart())
+                      .confirmEnd(recruit.getConfirmEnd())
+                      .recruitRegistedAt(recruit.getRecruitRegistedAt())
                       .build();
        }
 }
