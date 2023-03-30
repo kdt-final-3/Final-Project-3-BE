@@ -1,25 +1,26 @@
 package com.finalproject.recruit.entity;
 
+import com.finalproject.recruit.util.BaseTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "recruit")
-public class Recruit {
+public class Recruit extends BaseTime {
 
     /**
      * 채용공고 ID
      */
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recruit_id")
     private Long recruitId;
 
@@ -96,6 +97,11 @@ public class Recruit {
     @Column(name = "resume_title")
     private String resumeTitle;
 
+    /**
+     * 마감 여부 */
+
+    @Column(name = "recruit_close")
+    private boolean recruitClose;
 
 
 }

@@ -1,13 +1,17 @@
 package com.finalproject.recruit.entity;
 
+import com.finalproject.recruit.jisoo.parameter.MilitaryEnum;
 import com.finalproject.recruit.parameter.ApplyProcedure;
 import com.finalproject.recruit.util.BaseTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +22,7 @@ public class Apply extends BaseTime {
     /**
      * 지원서 고유값
      */
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "apply_id")
     private Long applyId;
 
@@ -99,7 +103,41 @@ public class Apply extends BaseTime {
     /**
      * 찜
      */
-    @Column(name = "like")
-    private boolean like;
+    @Column(name = "wish")
+    private boolean wish;
+
+    private LocalDateTime checkApply;
+
+    private LocalDateTime meeting;
+
+    private LocalDateTime passDay;
+
+    @Column(name = "fail_apply")
+    private boolean failApply;
+
+    /**
+     * 장애여부
+     * */
+    private boolean disorder;
+    /**
+     * 보훈
+     * */
+    private boolean veteran;
+
+    /**
+     * 고용지원금
+     * */
+    private boolean employment;
+
+    /**
+     * 병역
+     */
+    private MilitaryEnum militaryEnum;
+
+    /**
+     * 약관
+     * */
+    private boolean terms;
+
 
 }

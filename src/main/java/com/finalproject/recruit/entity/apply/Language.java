@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Builder
 public class Language {
 
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "language_id")
     private Long languageId;
 
@@ -33,5 +33,5 @@ public class Language {
     @Enumerated(EnumType.STRING)
     @Column(name = "language_level")
     private LanguageLevel languageLevel;
-    
+
 }

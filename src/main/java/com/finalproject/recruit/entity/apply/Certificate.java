@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table
@@ -16,7 +15,7 @@ import java.util.Date;
 @Builder
 public class Certificate {
 
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "certificate_id")
     private Long certificateId;
 
