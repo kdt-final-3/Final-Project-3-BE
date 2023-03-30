@@ -3,10 +3,7 @@ package com.finalproject.recruit.dto.member;
 import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-@Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @ToString
 public class MemberReqDTO {
 
