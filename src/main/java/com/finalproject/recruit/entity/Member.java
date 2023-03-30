@@ -60,4 +60,8 @@ public class Member {
      */
     @Column(name = "member_delete")
     private boolean memberDelete;
+
+
+
+
 }

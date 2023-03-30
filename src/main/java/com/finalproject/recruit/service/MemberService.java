@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -82,16 +83,13 @@ public class MemberService {
     /**
      * 로그아웃
      */
-    public ResponseEntity<?> logout(String accessToken) {
+    public ResponseEntity<?> logout(String accessToken, MemberReqDTO.Login login) {
 
-        if (!provider.validateToken(accessToken)) {
-            return response.fail("잘못된 요청입니다.");
-        }
-
+        String email = login.getMemberEmail();
         Authentication authentication = provider.getAuthentication(accessToken);
 
-        if (redisTemplate.opsForValue().get("RT : " + authentication.getName()) != null) {
-            redisTemplate.delete("RT : " + authentication.getName());
+        if (redisTemplate.opsForValue().get("RT : " + email) != null) {
+            redisTemplate.delete("RT : " + email);
         }
 
         Long expireTime = provider.getExpiration(accessToken);
@@ -135,66 +133,5 @@ public class MemberService {
 
     }
 
-    /**
-     * 비밀번호 재설정
-     */
-    public ResponseEntity<?> resetPassword(MemberReqDTO.ResetPassword passwordInfo) {
-        Member member = memberRepo.findByMemberEmail(passwordInfo.getMemberEmail()).orElse(null);
 
-        if (member == null) {
-            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
-        }
-        Integer result = null;
-        try {
-            result = memberRepo.resetPassword(passwordInfo.getMemberEmail(), passwordInfo.getNewPassword());
-        }
-        catch (Exception e) {
-            return response.fail("다시 시도해주세요", HttpStatus.BAD_REQUEST);
-        }
-
-        return result > 0?
-                response.success("성공하였습니다.")
-                : response.fail("다시 시도해주세요");
-
-    }
-
-    /**
-     * 사용자 정보 변경
-     */
-    public ResponseEntity<?> editInfo(String accessToken, MemberReqDTO.Edit edit) {
-        Integer result = null;
-        String email = provider.getAuthentication(accessToken).getName();
-
-        try {
-            result = memberRepo.updateInfo(edit.getPassword(), edit.getMemberPhone(), edit.getCeoName(), email);
-        }
-        catch (Exception e) {
-            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
-        }
-
-        return result > 0?
-                response.success("변경에 성공하였습니다.") :
-                response.fail("다시 시도해주세요");
-    }
-
-    /**
-     * 회원탈퇴
-     */
-    @Transactional
-    public ResponseEntity<?> signOut(String accessToken) {
-
-        String email = provider.getAuthentication(accessToken).getName();
-
-        try {
-            memberRepo.changeMemberStatus(email);
-        }
-        catch (NullPointerException e) {
-            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
-        }
-        catch (IllegalArgumentException e) {
-            return response.fail("잘못된 접근입니다.", HttpStatus.BAD_REQUEST);
-        }
-        return response.success();
-
-    }
 }
