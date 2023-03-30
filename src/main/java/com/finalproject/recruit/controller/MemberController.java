@@ -4,7 +4,11 @@ import com.finalproject.recruit.dto.member.MemberReqDTO;
 import com.finalproject.recruit.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,8 +37,8 @@ public class MemberController {
      * 로그아웃
      */
     @PostMapping("/auth/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken) {
-        return memberService.logout(accessToken);
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal MemberReqDTO.Login login) {
+        return memberService.logout(accessToken, login);
     }
 
     /**
@@ -53,27 +57,5 @@ public class MemberController {
         return memberService.existEmail(emailValidate.getMemberEmail());
     }
 
-    /**
-     * 비밀번호 재설정
-     */
-    @PutMapping("/auth/reset_password")
-    public ResponseEntity<?> resetPassword(@RequestBody MemberReqDTO.ResetPassword resetPassword) {
-        return memberService.resetPassword(resetPassword);
-    }
 
-    /**
-     * 회원 정보 변경
-     */
-    @PutMapping("/edit")
-    public ResponseEntity<?> editInfo(@RequestHeader("Authorization") String accessToken, @RequestBody MemberReqDTO.Edit edit) {
-        return memberService.editInfo(accessToken, edit);
-    }
-
-    /**
-     * 회원탈퇴
-     */
-    @PutMapping("/edit/delete")
-    public ResponseEntity<?> signOut(@RequestHeader("Authorization") String accessToken) {
-        return memberService.signOut(accessToken);
-    }
 }
