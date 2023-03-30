@@ -33,7 +33,7 @@ public class SecurityConfig {
     ===========================*/
     // 아래 URL은 권한검사X
     private static final String[] PUBLIC_URLS = {
-            "/signup", "/login", "/logout", "/userIdValidation","/test"
+            "/signup", "/login", "/logout", "/userIdValidation","/test", "/drop/**", "/notice/**", "/view/**"
     };
 
     @Bean
@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/sign-up", "/login", "/authority", "/reissue", "/logout").permitAll()
+                .antMatchers("/sign-up", "/login", "/authority", "/reissue", "/logout", "/drop/**", "/notice/**", "/view/**").permitAll()
                 .antMatchers("/userTest").hasRole("USER")
                 .antMatchers("/adminTest").hasRole("ADMIN")
                 .and()
