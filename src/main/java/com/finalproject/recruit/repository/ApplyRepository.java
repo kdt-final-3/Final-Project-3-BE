@@ -25,6 +25,8 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     Optional<Apply> findByApplyEmail(String email);
 
+    List<Apply> findByApplyNameAndRecruitRecruitId(String applyName, Long recruitId);
+
     List<Apply> findByRecruit_RecruitIdAndApplyProcedure(Long recruitId, ApplyProcedure applyProcedure);
 
     @Query("select count(a) from Apply a where a.recruit.recruitId = :id and a.applyDelete = false")
