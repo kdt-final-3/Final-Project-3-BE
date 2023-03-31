@@ -30,8 +30,8 @@ public class ApplicantController {
     /**
      * 지원자 중복 지원 체크
      * */
-    @GetMapping("/check/{recruitId}")
-    public ResponseEntity<?> checkEmail(@RequestParam String email, @PathVariable Long recruitId){
+    @GetMapping("/check")
+    public ResponseEntity<?> checkEmail(@RequestParam String email, @RequestParam Long recruitId){
         return response.success(applicantService.checkEmail(email, recruitId));
     }
 

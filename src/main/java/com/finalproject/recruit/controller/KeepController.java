@@ -3,10 +3,7 @@ package com.finalproject.recruit.controller;
 import com.finalproject.recruit.service.KeepService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping("/drop")
@@ -28,8 +25,8 @@ public class KeepController {
     /**
      * 탈락 인재 조회
      * */
-    @GetMapping("/view-applicant/{recruitId}")
-    public ResponseEntity<?> dropApplicants (@PathVariable Long recruitId){
+    @GetMapping("/view-applicant")
+    public ResponseEntity<?> dropApplicants (@RequestParam Long recruitId){
         return keepService.dropApplicants(recruitId);
     }
 

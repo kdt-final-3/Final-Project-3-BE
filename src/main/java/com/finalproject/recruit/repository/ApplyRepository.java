@@ -20,7 +20,7 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     Optional<Apply> findByApplyEmail(String email);
 
-
+    List<Apply> findByApplyNameAndRecruitRecruitId(String applyName, Long recruitId);
 
 
 }
