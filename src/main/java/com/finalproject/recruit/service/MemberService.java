@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -33,7 +32,7 @@ public class MemberService {
 
     private final RedisTemplate redisTemplate;
 
-    private AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final PasswordEncoder encoder;
 
@@ -64,6 +63,7 @@ public class MemberService {
      * 로그인
      */
     public ResponseEntity<?> login(MemberReqDTO.Login login) {
+
         Member member = memberRepo.findByMemberEmail(login.getMemberEmail()).orElse(null);
         if (member == null) {
             return response.fail("해당되는 유저가 존재하지 않습니다.");
@@ -71,25 +71,25 @@ public class MemberService {
 
         UsernamePasswordAuthenticationToken authenticationToken = login.toAuthentication();
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        //Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        MemberResDTO.TokenInfo tokenInfo = provider.generateToken(authentication);
+        MemberResDTO.TokenInfo tokenInfo = provider.generateToken(login);
 
         redisTemplate.opsForValue()
-                .set("RT : " + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-
+                .set("RT : " + login.getMemberEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         return response.success(tokenInfo, "로그인에 성공하셨습니다.", HttpStatus.OK);
     }
     /**
      * 로그아웃
      */
-    public ResponseEntity<?> logout(String accessToken, MemberReqDTO.Login login) {
+    public ResponseEntity<?> logout(String accessToken) {
+        System.out.println(accessToken);
 
-        String email = login.getMemberEmail();
         Authentication authentication = provider.getAuthentication(accessToken);
+        System.out.println(authentication.toString());
 
-        if (redisTemplate.opsForValue().get("RT : " + email) != null) {
-            redisTemplate.delete("RT : " + email);
+        if (redisTemplate.opsForValue().get("RT : " + authentication.getName()) != null) {
+            redisTemplate.delete("RT : " + authentication.getName());
         }
 
         Long expireTime = provider.getExpiration(accessToken);
@@ -105,7 +105,7 @@ public class MemberService {
     /**
      * 토큰 기한 연장
      */
-    public ResponseEntity<?> reissue(String accessToken) {
+    public ResponseEntity<?> reissue(String accessToken, MemberReqDTO.Login login) {
         if (!provider.validateToken(accessToken)) {
             return response.fail("RefreshToken의 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
@@ -118,7 +118,7 @@ public class MemberService {
             return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
         }
 
-        MemberResDTO.TokenInfo tokenInfo = provider.generateToken(authentication);
+        MemberResDTO.TokenInfo tokenInfo = provider.generateToken(login);
 
         redisTemplate.opsForValue()
                 .set("RT : " + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
@@ -128,10 +128,54 @@ public class MemberService {
 
     public ResponseEntity<?> existEmail(String email) {
         return memberRepo.existsByMemberEmail(email)?
-                response.success("가입 가능한 이메일입니다."):
-                response.fail("이미 가입된 이메일입니다.");
+                response.fail("이미 가입된 이메일입니다."):
+        response.success("가입 가능한 이메일입니다.");
+    }
+
+    @Transactional
+    public ResponseEntity<?> resetPassword(MemberReqDTO.ResetPassword password) {
+        System.out.println(password.getNewPassword());
+        if (!password.getNewPassword().equals(password.getPasswordCheck())) {
+            return response.fail("일치하지 않습니다");
+        }
+        Member member = memberRepo.findByMemberEmail(password.getMemberEmail()).orElse(null);
+
+        try {
+            member.resetPassword(encoder.encode(password.getNewPassword()));
+            System.out.println(member.getPassword());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("실패");
+        }
+        return response.success();
 
     }
 
 
+    @Transactional
+    public ResponseEntity<?> updateMemberInfo(String accessToken, MemberReqDTO.Edit edit) {
+        Member member = memberRepo.findByMemberEmail(provider.getAuthentication(accessToken).getName()).orElse(null);
+        try {
+            edit.setPassword(encoder.encode(edit.getPassword()));
+            member.updateMemberInfo(edit);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("실패");
+        }
+        return response.success();
+    }
+    @Transactional
+    public ResponseEntity<?> dropMember(String accessToken) {
+        Member member = memberRepo.findByMemberEmail(provider.getAuthentication(accessToken).getName()).orElse(null);
+        try {
+            member.dropMember();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("실패");
+        }
+        return response.success();
+    }
 }

@@ -1,5 +1,6 @@
 package com.finalproject.recruit.jwt;
 
+import com.finalproject.recruit.dto.member.MemberReqDTO;
 import com.finalproject.recruit.dto.member.MemberResDTO;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +33,21 @@ public class JwtTokenProvider {
     /**
      * 유저 정보를 가지고 AccessToken, RereshToken을 생성하는 메소드
      */
-    public MemberResDTO.TokenInfo generateToken(Authentication authentication) {
+    public MemberResDTO.TokenInfo generateToken(MemberReqDTO.Login login) {
         //권한 가져오기
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining());
+//        String authorities = authentication.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.joining());
 
         long now = (new Date()).getTime();
 
         //Access Token 생성
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("email", authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
+                .setHeaderParam("typ", "JWT")
+                .setSubject(login.getMemberEmail())
+                .claim("email", login.getMemberEmail())
+                .claim(AUTHORITIES_KEY, "MEMBER")
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
