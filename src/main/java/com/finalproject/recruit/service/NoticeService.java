@@ -72,7 +72,7 @@ public class NoticeService {
     @Transactional
     public ResponseEntity<?> sendEmail(EmailReq emailReq) {
         try {
-            Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
+            Recruit recruit = recruitRepository.findByRecruitId(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
             String message=emailReq.getMailContent(); //보낼 메시지
             String interviewDate = emailReq.getInterviewDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd일 HH시 mm분"));
             if (emailReq.getNoticeStep() == NoticeStep.면접제안) {
@@ -81,7 +81,6 @@ public class NoticeService {
             }
             message+="감사합니다. ";
 
-
             //이메일 전송!!
             List<String> applyEmails = emailReq.getApplyIds().stream()
                     .map(applyId -> applyRepository.findByApplyId(applyId).orElseThrow(()-> new IllegalArgumentException("해당 apply존재하지 않습니다.")))
@@ -89,7 +88,7 @@ public class NoticeService {
                     .collect(Collectors.toList());
 
             String recipient = String.join(" ",applyEmails);
-            String title = recruit.getMember().getCompanyName()+"입니다.";
+            String title = recruit.getMember().getCompanyName()+" 입니다.";
             SimpleMailMessage notice = new SimpleMailMessage();
             notice.setTo(recipient.split(" "));
             notice.setSubject(title);
@@ -120,7 +119,7 @@ public class NoticeService {
     }
 
     public ResponseEntity<?> selectStep(SelectStepReq selectStepReq) {
-        Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(selectStepReq.getRecruitId())
+        Recruit recruit = recruitRepository.findByRecruitId(selectStepReq.getRecruitId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
 
         String message = "안녕하세요. "+ recruit.getMember().getCompanyName()+"입니다. "+
