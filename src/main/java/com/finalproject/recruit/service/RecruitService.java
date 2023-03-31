@@ -2,6 +2,8 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.recruit.RecruitRes;
 import com.finalproject.recruit.entity.Recruit;
+import com.finalproject.recruit.exception.recruit.ErrorCode;
+import com.finalproject.recruit.exception.recruit.RecruitException;
 import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,5 +52,25 @@ public class RecruitService {
         }
 
         return recruitResList;
+    }
+
+    /*===========================
+        채용폼 상세조회 : Detail
+     ===========================*/
+    public RecruitRes selectRecruitDetail(Long recruitId){
+        try{
+            Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Request %d RecruitFrom not found", recruitId))
+            );
+            // 채용기간 기반, 채용상태 조정
+            recruit.adjustProcedure();
+
+            // 채용상태가 변경된 값을 출력
+            return new RecruitRes(recruitRepository.save(recruit));
+        }catch(RecruitException e){
+            return null;
+        }
     }
 }

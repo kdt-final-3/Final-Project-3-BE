@@ -5,10 +5,7 @@ import com.finalproject.recruit.dto.ResponseDTO;
 import com.finalproject.recruit.dto.recruit.RecruitRes;
 import com.finalproject.recruit.service.RecruitService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,6 +37,15 @@ public class RecruitController {
                                                     @RequestParam(name = "title") String recruitTitle){
         String memberId = null;
         List<RecruitRes> res = recruitService.searchRecruit(memberId, Boolean.parseBoolean(recruitStatus), recruitTitle);
+        return ResponseDTO.message(res);
+    }
+
+    /*===========================
+    채용폼 상세조회
+    ===========================*/
+    @GetMapping("/{recruit_id}")
+    public ResponseDTO<RecruitRes> detailRecruit(@PathVariable Long recruit_id){
+        RecruitRes res = recruitService.selectRecruitDetail(recruit_id);
         return ResponseDTO.message(res);
     }
 
