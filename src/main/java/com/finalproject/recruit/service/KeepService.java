@@ -27,7 +27,7 @@ public class KeepService {
     private final Response response;
 
     public ResponseEntity<?> recentRecruit(String email) {
-        Recruit recentRecruit = recruitRepository.findTopByRecruitDeleteIsFalseAndMemberMemberEmailOrderByCreatedTimeDesc(email).orElse(null);
+        Recruit recentRecruit = recruitRepository.findTopByAndMemberMemberEmailOrderByRecruitRegistedAt(email).orElse(null);
         if (recentRecruit == null) {
             return response.fail("채용공고가 존재하지 않습니다.");
         }

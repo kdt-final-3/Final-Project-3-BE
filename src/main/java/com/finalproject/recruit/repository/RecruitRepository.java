@@ -8,11 +8,16 @@ import java.util.Optional;
 
 
 public interface RecruitRepository extends JpaRepository<Recruit, Long> {
+    /*===========================
+        채용폼
+    ===========================*/
+    Optional<Recruit> findByRecruitId(Long recruitId);
+    List<Recruit> findAllByRecruitOngoing(boolean status);
+    List<Recruit> findAllByRecruitOngoingAndRecruitTitleContains(boolean status, String title);
 
-    Optional<Recruit> findTopByRecruitDeleteIsFalseAndMemberMemberEmailOrderByCreatedTimeDesc(String email);
-
-    Optional<Recruit> findByRecruitIdAndRecruitDeleteIsFalse(Long recruitId);
-
+    /*===========================
+        탈락인재 & 알람 & 지원자
+    ===========================*/
+    Optional<Recruit> findTopByAndMemberMemberEmailOrderByRecruitRegistedAt(String email);
     List<Recruit> findByMemberMemberEmail(String memberEmail);
-
 }
