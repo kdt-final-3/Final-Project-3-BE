@@ -29,4 +29,18 @@ public class RecruitController {
         List<RecruitRes> res = recruitService.selectALlRecruit(memberId, Boolean.parseBoolean(recruitStatus));
         return ResponseDTO.message(res);
     }
+
+    /*===========================
+        채용폼 검색
+    ===========================*/
+    // 채용상태 : recruit_status
+    // ( true : 진행중 / false : 마감됨  )
+    @GetMapping("/search")
+    public ResponseDTO<List<RecruitRes>> searchRecruit(@RequestParam(name = "status") String recruitStatus,
+                                                    @RequestParam(name = "title") String recruitTitle){
+        String memberId = null;
+        List<RecruitRes> res = recruitService.searchRecruit(memberId, Boolean.parseBoolean(recruitStatus), recruitTitle);
+        return ResponseDTO.message(res);
+    }
+
 }
