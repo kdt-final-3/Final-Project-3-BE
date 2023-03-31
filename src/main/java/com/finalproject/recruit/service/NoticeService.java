@@ -128,4 +128,17 @@ public class NoticeService {
 
         return response.success(message, "success", HttpStatus.OK);
     }
+
+    public ResponseEntity<?> searchApplicant(String applyName, Long recruitId) {
+        List<Apply> applies = applyRepository.findByApplyNameAndRecruitRecruitId(applyName, recruitId);
+        List<ApplicantsRes> applicantsResList = applies.stream()
+                .map(apply -> ApplicantsRes.fromApply(
+                        apply,
+                        mailRepository.findTopByApplyApplyIdOrderByCreatedTimeDesc(apply.getApplyId())
+                                .map(Mail::getCreatedTime)
+                                .orElse(null)))
+                .collect(Collectors.toList());
+        return response.success(applicantsResList);
+
+    }
 }
