@@ -1,5 +1,6 @@
 package com.finalproject.recruit.service;
 
+import com.finalproject.recruit.dto.recruit.RecruitReq;
 import com.finalproject.recruit.dto.recruit.RecruitRes;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.exception.recruit.ErrorCode;
@@ -7,6 +8,7 @@ import com.finalproject.recruit.exception.recruit.RecruitException;
 import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +71,34 @@ public class RecruitService {
 
             // 채용상태가 변경된 값을 출력
             return new RecruitRes(recruitRepository.save(recruit));
+        }catch(RecruitException e){
+            return null;
+        }
+    }
+
+    /*===========================
+        채용폼 수정
+    ===========================*/
+    @Transactional
+    public RecruitRes editRecruit(RecruitReq req, Long recruitId){
+        // 기존에 등록된 Recruit 정보추출
+        try{
+            Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Request %d RecruitFrom not found", recruitId)
+                    ));
+            // 입력된 정보로 Entity 수정
+            recruit.updateEntity(req);
+            // 단계날짜 변경시, 채용상태 재설정
+            recruit.adjustProcedure();
+
+            // 수정된 내용 DB 저장
+            recruit = recruitRepository.save(recruit);
+
+            // DB에 저장된 내용확인
+            return RecruitRes.fromEntity(recruit);
+
         }catch(RecruitException e){
             return null;
         }

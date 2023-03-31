@@ -2,6 +2,7 @@ package com.finalproject.recruit.controller;
 
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.ResponseDTO;
+import com.finalproject.recruit.dto.recruit.RecruitReq;
 import com.finalproject.recruit.dto.recruit.RecruitRes;
 import com.finalproject.recruit.service.RecruitService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class RecruitController {
     }
 
     /*===========================
-    채용폼 상세조회
+        채용폼 상세조회
     ===========================*/
     @GetMapping("/{recruit_id}")
     public ResponseDTO<RecruitRes> detailRecruit(@PathVariable Long recruit_id){
@@ -49,4 +50,12 @@ public class RecruitController {
         return ResponseDTO.message(res);
     }
 
+    /*===========================
+        채용폼 수정
+    ===========================*/
+    @PutMapping("/{recruit_id}")
+    public ResponseDTO<RecruitRes> editRecruit(@RequestBody RecruitReq req, @PathVariable Long recruit_id){
+        RecruitRes res = recruitService.editRecruit(req, recruit_id);
+        return ResponseDTO.message(res);
+    }
 }
