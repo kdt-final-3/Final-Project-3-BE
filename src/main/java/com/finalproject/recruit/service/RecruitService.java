@@ -123,6 +123,30 @@ public class RecruitService {
     }
 
     /*===========================
+        채용폼 삭제
+    ===========================*/
+    @Transactional
+    public String deleteRecruit(Long recruitId){
+        try{
+            Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Request %d RecruitFrom not found", recruitId)
+                    ));
+            // 채용폼 삭제상태로 변환 & 저장
+            recruit.setRecruitDelete();
+            recruit = recruitRepository.save(recruit);
+
+            // DB에 저장된 상태값 전송
+            return "Recruit From Delete Request at : " + recruit.getRecruitDeleteAt();
+
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /*===========================
         Component
     ===========================*/
     // 채용폼 연결링크 생성

@@ -67,4 +67,13 @@ public class RecruitController {
         RecruitRes res = recruitService.registRecruit(req);
         return ResponseDTO.message(res);
     }
+
+    /*===========================
+        채용폼 삭제
+    ===========================*/
+    @PutMapping("/delete/{recruit_id}")
+    public ResponseDTO<String> deleteRecruit(@PathVariable Long recruit_id){
+        String res = recruitService.deleteRecruit(recruit_id);
+        return ResponseDTO.message(res);
+    }
 }
