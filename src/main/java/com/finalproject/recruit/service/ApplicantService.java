@@ -36,7 +36,7 @@ public class ApplicantService {
             if (!checkEmail(applicationReq.getApplyEmail(), applicationReq.getRecruitId())){
                 return response.fail("이미 현 채용공고에 지원하셨습니다.");
             }
-            Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(applicationReq.getRecruitId()).orElseThrow(
+            Recruit recruit = recruitRepository.findByRecruitId(applicationReq.getRecruitId()).orElseThrow(
                     () -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다.")
             );
             Apply apply = applyRepository.save(applicationReq.toApply(recruit));
@@ -61,7 +61,7 @@ public class ApplicantService {
     }
 
     public ResponseEntity<?> preRequired(Long recruitId) {
-        Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(recruitId).orElse(null);
+        Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElse(null);
         if (recruit == null) {
             return response.fail("채용공고가 존재하지 않습니다.");
         }
