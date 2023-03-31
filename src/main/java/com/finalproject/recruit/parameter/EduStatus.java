@@ -7,7 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum EduStatus{
 
-    재학, 졸업, 휴학
-
+    재학, 졸업, 휴학, 중퇴, 졸업예정
 
 }
