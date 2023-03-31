@@ -16,8 +16,12 @@ import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +34,8 @@ public class NoticeService {
     private final MailRepository mailRepository;
 
     private final Response response;
+
+    private final JavaMailSender mailSender;
 
     public ResponseEntity<?> recruitList(String memberEmail) {
         List<NoticeRecruitsRes> noticeRecruitsRes = recruitRepository.findByMemberMemberEmail(memberEmail).stream()
@@ -63,29 +69,48 @@ public class NoticeService {
         return response.success(messageHistoryRes);
     }
 
+    @Transactional
     public ResponseEntity<?> sendEmail(EmailReq emailReq) {
         try {
-            Apply apply = applyRepository.findByApplyId(emailReq.getApplyId()).orElseThrow(()-> new IllegalArgumentException("지원자가 존재하지 않습니다."));
-            Recruit recruit = recruitRepository.findByRecruitId(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
+            Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(emailReq.getRecruitId()).orElseThrow(()-> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
             String message=emailReq.getMailContent(); //보낼 메시지
-            String recipient = apply.getApplyEmail(); //받는 사람 (이메일)
+            String interviewDate = emailReq.getInterviewDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd일 HH시 mm분"));
             if (emailReq.getNoticeStep() == NoticeStep.면접제안) {
-                message+="면접 날짜는 "+ emailReq.getInterviewDate()+"입니다."+
-                    "잘 준비하셔서 좋은 성과 있으시길 바랍니다.";
+                message+="면접 날짜는 "+ interviewDate+"입니다. "+
+                    "잘 준비하셔서 좋은 성과 있으시길 바랍니다. ";
             }
             message+="감사합니다. ";
-            //이메일 전송!!
 
-            //apply 배열일경우
+
+            //이메일 전송!!
+            List<String> applyEmails = emailReq.getApplyIds().stream()
+                    .map(applyId -> applyRepository.findByApplyId(applyId).orElseThrow(()-> new IllegalArgumentException("해당 apply존재하지 않습니다.")))
+                    .map(Apply::getApplyEmail)
+                    .collect(Collectors.toList());
+
+            String recipient = String.join(" ",applyEmails);
+            String title = recruit.getMember().getCompanyName()+"입니다.";
+            SimpleMailMessage notice = new SimpleMailMessage();
+            notice.setTo(recipient.split(" "));
+            notice.setSubject(title);
+            notice.setText(message);
+            mailSender.send(notice);
+
 
             //이메일 전송 내역 저장
-            Mail mail = Mail.builder()
-                    .recruit(recruit)
-                    .apply(apply)
-                    .mailContent(message)
-                    .noticeStep(emailReq.getNoticeStep())
-                    .build();
-            mailRepository.save(mail);
+            List<Apply> applies = applyEmails.stream()
+                        .map(email -> applyRepository.findByApplyEmail(email).orElse(null))
+                        .collect(Collectors.toList());
+
+            for(Apply a : applies){
+                Mail mail = Mail.builder()
+                        .recruit(recruit)
+                        .apply(a)
+                        .mailContent(message)
+                        .noticeStep(emailReq.getNoticeStep())
+                        .build();
+                mailRepository.save(mail);
+            }
 
             return response.success("이메일이 전송되었습니다.");
 
@@ -95,7 +120,7 @@ public class NoticeService {
     }
 
     public ResponseEntity<?> selectStep(SelectStepReq selectStepReq) {
-        Recruit recruit = recruitRepository.findByRecruitId(selectStepReq.getRecruitId())
+        Recruit recruit = recruitRepository.findByRecruitIdAndRecruitDeleteIsFalse(selectStepReq.getRecruitId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다."));
 
         String message = "안녕하세요. "+ recruit.getMember().getCompanyName()+"입니다. "+
