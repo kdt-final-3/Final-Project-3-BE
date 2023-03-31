@@ -21,7 +21,7 @@ public class RecruitController {
      ===========================*/
     // 채용상태 : recruit_status
     // ( true : 진행중 / false : 마감됨  )
-    @GetMapping("/")
+    @GetMapping
     public ResponseDTO<List<RecruitRes>> selectAllRecruit(@RequestParam(name = "status") String recruitStatus){
         String memberId = null;
         List<RecruitRes> res = recruitService.selectALlRecruit(memberId, Boolean.parseBoolean(recruitStatus));
@@ -56,6 +56,15 @@ public class RecruitController {
     @PutMapping("/{recruit_id}")
     public ResponseDTO<RecruitRes> editRecruit(@RequestBody RecruitReq req, @PathVariable Long recruit_id){
         RecruitRes res = recruitService.editRecruit(req, recruit_id);
+        return ResponseDTO.message(res);
+    }
+
+    /*===========================
+        채용폼 등록
+    ===========================*/
+    @PostMapping
+    public ResponseDTO<RecruitRes> registRecruit(@RequestBody RecruitReq req){
+        RecruitRes res = recruitService.registRecruit(req);
         return ResponseDTO.message(res);
     }
 }

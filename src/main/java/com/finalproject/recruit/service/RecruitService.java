@@ -16,6 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RecruitService {
+    private static final String SERVICE_DOMAIN = "https://www.jobkok.com/view";
     private final RecruitRepository recruitRepository;
 
     /*===========================
@@ -102,5 +103,30 @@ public class RecruitService {
         }catch(RecruitException e){
             return null;
         }
+    }
+
+    /*===========================
+        채용폼 신규등록
+     ===========================*/
+    @Transactional
+    public RecruitRes registRecruit(RecruitReq req){
+        try{
+            Recruit recruit = recruitRepository.save(new Recruit(req));
+            recruit.setRecruitUrl(generateUrl(String.valueOf(recruit.getRecruitId())));
+            recruit.adjustProcedure();
+
+            return RecruitRes.fromEntity(recruitRepository.save(recruit));
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /*===========================
+        Component
+    ===========================*/
+    // 채용폼 연결링크 생성
+    public String generateUrl(String recruitId){
+        return SERVICE_DOMAIN + "/" + recruitId;
     }
 }
