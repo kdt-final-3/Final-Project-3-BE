@@ -59,4 +59,8 @@ public class NoticeController {
         return noticeService.selectStep(selectStepReq);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchApplicant(@RequestParam String applyName, Long recruitId){
+        return noticeService.searchApplicant(applyName, recruitId);
+    }
 }
