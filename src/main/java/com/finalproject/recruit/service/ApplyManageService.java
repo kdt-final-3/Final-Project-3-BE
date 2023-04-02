@@ -2,6 +2,7 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
+import com.finalproject.recruit.parameter.ApplyProcedure;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,22 @@ public class ApplyManageService {
      */
     public ResponseEntity<?> findAllApplicants(Long recruitId) {
         List<ApplyResponseDTO> data = applyRepository.findByRecruitRecruitId(recruitId)
+                .stream().map(ApplyResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return response.success(data);
+    }
+
+    /**
+     * 채용단계별 지원자 조회
+     * @param recruitId
+     * @param procedure
+     * @return
+     */
+    public ResponseEntity<?> findApplicantByProcedure(Long recruitId, String procedure) {
+        ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
+
+        List<ApplyResponseDTO> data = applyRepository.findByRecruit_RecruitIdAndApplyProcedure(recruitId, applyProcedure)
                 .stream().map(ApplyResponseDTO::new)
                 .collect(Collectors.toList());
 
