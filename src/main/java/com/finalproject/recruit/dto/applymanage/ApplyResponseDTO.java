@@ -1,0 +1,39 @@
+package com.finalproject.recruit.dto.applymanage;
+
+import com.finalproject.recruit.entity.Apply;
+import com.finalproject.recruit.parameter.ApplyProcedure;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ApplyResponseDTO {
+
+    Long applyId;
+    String applyName;
+    String applyPhone;
+    String applyEmail;
+    ApplyProcedure applyProcedure;
+    Boolean pass;
+    LocalDateTime createdTime;
+    Boolean applyDelete;
+    Boolean wish;
+
+    public ApplyResponseDTO(Apply apply) {
+        this.applyId = apply.getApplyId();
+        this.applyName = apply.getApplyName();
+        this.applyPhone = apply.getApplyPhone();
+        this.applyEmail = apply.getApplyEmail();
+        this.applyProcedure = apply.getApplyProcedure();
+        this.pass = apply.isPass();
+        this.createdTime = apply.getCreatedTime();
+        this.applyDelete = apply.isApplyDelete();
+        this.wish = apply.isWish();
+    }
+}
