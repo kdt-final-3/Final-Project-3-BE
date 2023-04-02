@@ -1,7 +1,7 @@
 package com.finalproject.recruit.config;
 
-import com.finalproject.recruit.jwt.JwtAuthenticationFilter;
-import com.finalproject.recruit.jwt.JwtTokenProvider;
+import com.finalproject.recruit.jwt.JwtFilter;
+import com.finalproject.recruit.jwt.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,25 +28,50 @@ import java.util.List;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
+    private final JwtManager jwtManager;
+    private final RedisTemplate redisTemplate;
+
+
     /*===========================
         권한검사
     ===========================*/
     // 아래 URL은 권한검사X
     private static final String[] PUBLIC_URLS = {
-            "/userIdValidation","/test", "/drop/**", "/notice/**", "/view/**", "/recruit/**", "/auth/**"
+            "/userIdValidation","/test", "/drop/**", "/notice/**", "/view/**", "/auth/login"
     };
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { //시큐리티 filter 제외, 그러나 OncePerRequestFilter는 시큐리티 필터가 아니라서 로직실행
         return (web) -> web.ignoring().mvcMatchers(PUBLIC_URLS);
     }
 
-    /**
-     * JWT 설정 및 Redis 설정 관련
-     */
-    private final JwtTokenProvider provider;
 
-    private final RedisTemplate redisTemplate;
+    /*===========================
+        Security Chain
+    ===========================*/
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
+
+        return http
+                .authorizeRequests()// 다음 리퀘스트에 대한 사용권한 체크
+                .mvcMatchers(PUBLIC_URLS).permitAll() // 가입 및 인증 주소는 누구나 접근가능
+                .and()
+                .authorizeRequests()// 다음 리퀘스트에 대한 사용권한 체크
+                .anyRequest().authenticated()// 그외 나머지 요청은 모두 인증된 회원만 접근 가능
+                .and()
+                .cors()
+                .and()
+                .csrf().disable() // rest api이므로 csrf 보안이 필요없으므로 disable처리
+                .httpBasic().disable() // 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
+                // .formLogin().loginPage("/index").permitAll()//로그인 기본 url 설정
+                // .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt token으로 인증할것이므로 세션필요없으므로 생성안함.
+                .and()
+                .addFilterBefore(JwtFilter.of(jwtManager), UsernamePasswordAuthenticationFilter.class)
+                .build();
+        //인증을 처리하는 기본필터 UsernamePasswordAuthenticationFilter 대신 별도의 인증 로직을 가진 필터를 생성하고 사용하고 싶을 때 아래와 같이 필터를 등록하고 사용
+    }
+
+        /*
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .httpBasic().disable()
@@ -61,40 +86,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(provider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
         // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 적용시킨다.
     }
-
-    // 암호화에 필요한 PasswordEncoder Bean 등록
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
-
-        return http
-                .cors()
-                .and()
-
-                .authorizeRequests()// 다음 리퀘스트에 대한 사용권한 체크
-                .mvcMatchers(PUBLIC_URLS).permitAll() // 가입 및 인증 주소는 누구나 접근가능
-
-                .and()
-
-                .authorizeRequests()// 다음 리퀘스트에 대한 사용권한 체크
-                .anyRequest().authenticated()// 그외 나머지 요청은 모두 인증된 회원만 접근 가능
-                .and()
-                .csrf().disable() // rest api이므로 csrf 보안이 필요없으므로 disable처리
-                .httpBasic().disable() // 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
-//            .formLogin().loginPage("/index").permitAll()//로그인 기본 url 설정
-//            .and()
-
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt token으로 인증할것이므로 세션필요없으므로 생성안함.
-
-                .and()
-
-                .build();
-        //인증을 처리하는 기본필터 UsernamePasswordAuthenticationFilter 대신 별도의 인증 로직을 가진 필터를 생성하고 사용하고 싶을 때 아래와 같이 필터를 등록하고 사용
-    }
+     */
 
 
     /*===========================
@@ -126,5 +118,15 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+
+    /*===========================
+        ETC
+     ===========================*/
+    // 암호화에 필요한 PasswordEncoder Bean 등록
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

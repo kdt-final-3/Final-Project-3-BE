@@ -2,10 +2,12 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.recruit.RecruitReq;
 import com.finalproject.recruit.dto.recruit.RecruitRes;
+import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.exception.recruit.ErrorCode;
 import com.finalproject.recruit.exception.recruit.RecruitException;
 import com.finalproject.recruit.repository.RecruitRepository;
+import com.finalproject.recruit.service.archive.MemberServiceArch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +20,14 @@ import java.util.List;
 public class RecruitService {
     private static final String SERVICE_DOMAIN = "https://www.jobkok.com/view";
     private final RecruitRepository recruitRepository;
+    private final MemberServiceArch memberServiceArch;
 
     /*===========================
         채용폼 전체조회
     ===========================*/
-    public List<RecruitRes> selectALlRecruit(String memberId, boolean recruitStatus) {
+    public List<RecruitRes> selectALlRecruit(String memberEmail, boolean recruitStatus) {
         try {
-            List<Recruit> recruitList = recruitRepository.findAllByRecruitOngoing(recruitStatus);
+            List<Recruit> recruitList = recruitRepository.findAllByMember_MemberEmailAndRecruitOngoing(memberEmail, recruitStatus);
             return checkRecruitRes(recruitList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -35,9 +38,9 @@ public class RecruitService {
     /*===========================
         채용폼 검색
     ===========================*/
-    public List<RecruitRes> searchRecruit(String memberId, boolean recruitStatus, String recruitTitle){
+    public List<RecruitRes> searchRecruit(String memberEmail, boolean recruitStatus, String recruitTitle){
         try{
-            List<Recruit> recruitList = recruitRepository.findAllByRecruitOngoingAndRecruitTitleContains(recruitStatus, recruitTitle);
+            List<Recruit> recruitList = recruitRepository.findAllByAndMemberMemberEmailAndRecruitOngoingAndRecruitTitleContains(memberEmail, recruitStatus, recruitTitle);
             return checkRecruitRes(recruitList);
         }catch(Exception e){
             e.printStackTrace();
@@ -109,9 +112,10 @@ public class RecruitService {
         채용폼 신규등록
      ===========================*/
     @Transactional
-    public RecruitRes registRecruit(RecruitReq req){
+    public RecruitRes registRecruit(RecruitReq req, String memberEmail){
         try{
-            Recruit recruit = recruitRepository.save(new Recruit(req));
+            Member member = memberServiceArch.loadMemberByMemberEmail(memberEmail);
+            Recruit recruit = recruitRepository.save(new Recruit(req, member));
             recruit.setRecruitUrl(generateUrl(String.valueOf(recruit.getRecruitId())));
             recruit.adjustProcedure();
 

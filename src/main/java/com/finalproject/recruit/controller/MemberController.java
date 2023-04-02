@@ -1,24 +1,23 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.dto.member.MemberReqDTO;
-import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.service.MemberService;
+import com.finalproject.recruit.service.archive.MemberServiceArch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
-
+    // 신규 JWT 적용 service
     private final MemberService memberService;
+
+    // 기존 Service
+    private final MemberServiceArch memberServiceArch;
 
     /**
      * 회원가입
@@ -28,30 +27,29 @@ public class MemberController {
         return memberService.signUp(signUp);
     }
 
-    /**
-     * 로그인
-     */
+    /*===========================
+        로그인
+     ===========================*/
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody MemberReqDTO.Login login) {
-        System.out.println(login.getMemberEmail());
-        System.out.println(login.getPassword());
         return memberService.login(login);
     }
 
-    /**
-     * 로그아웃
-     */
+    /*===========================
+        로그아웃
+     ===========================*/
     @PostMapping("/auth/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken) {
-        return memberService.logout(accessToken);
+    public ResponseEntity<?> logout(Authentication authentication) {
+        return memberService.logout(authentication);
     }
 
-    /**
-     * 토큰 기한 연장
-     */
+    /*===========================
+        토큰기한 연장
+     ===========================*/
     @PostMapping("/auth/reissue")
-    public ResponseEntity<?> reissue(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal MemberReqDTO.Login login) {
-        return memberService.reissue(accessToken, login);
+    public ResponseEntity<?> reissue(Authentication authentication) {
+        AuthDTO member = (AuthDTO) authentication.getPrincipal();
+        return memberService.reissue(authentication, member);
     }
 
     /**
@@ -59,22 +57,47 @@ public class MemberController {
      */
     @GetMapping("/auth/email_validation")
     public ResponseEntity<?> validateEmail(@RequestBody MemberReqDTO.EmailValidate emailValidate) {
-        return memberService.existEmail(emailValidate.getMemberEmail());
+        return memberServiceArch.existEmail(emailValidate.getMemberEmail());
     }
 
     @PutMapping("/auth/resetPassword")
     public ResponseEntity<?> resetPassword(@RequestBody MemberReqDTO.ResetPassword resetPassword) {
-        return memberService.resetPassword(resetPassword);
+        return memberServiceArch.resetPassword(resetPassword);
     }
 
     @PutMapping("/auth/updateMemberInfo")
     public ResponseEntity<?> updateMemberInfo(@RequestHeader("Authorization") String accessToken, @RequestBody MemberReqDTO.Edit edit) {
-        return memberService.updateMemberInfo(accessToken, edit);
+        return memberServiceArch.updateMemberInfo(accessToken, edit);
     }
 
     @PutMapping("/auth/drop")
     public ResponseEntity<?> dropMember(@RequestHeader("Authorization") String accessToken) {
-        return memberService.dropMember(accessToken);
+        return memberServiceArch.dropMember(accessToken);
+    }
+    /*===========================
+        Archive
+     ===========================
+     **
+     * 로그인
+     *
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody MemberReqDTO.Login login) {
+        return memberService.login(login);
+    }
+     **
+     * 로그아웃
+     *
+    @PostMapping("/auth/logout")
+    public ResponseEntity<?> logout(Authentication authentication) {
+        return memberService.logout(authentication);
+    }
+     **
+     * 토큰 기한 연장
+     *
+    @PostMapping("/auth/reissue")
+    public ResponseEntity<?> reissue(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal MemberReqDTO.Login login) {
+        return memberService.reissue(accessToken, login);
     }
 
+    */
 }

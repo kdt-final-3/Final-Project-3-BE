@@ -170,7 +170,8 @@ public class Recruit {
         변환 메소드
      ===========================*/
     // 신규 채용폼 등록
-    public Recruit(RecruitReq req) {
+    public Recruit(RecruitReq req, Member member) {
+        this.member = member;
         this.recruitTitle = req.getTitle();
         this.recruitContent = req.getContents();
         this.keywordStandard = req.getKeywordStandard();

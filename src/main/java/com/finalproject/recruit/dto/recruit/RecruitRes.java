@@ -41,7 +41,7 @@ public class RecruitRes {
     ===========================*/
     public RecruitRes(Recruit recruit){
         this.id = recruit.getRecruitId();
-        //this.uploader = recruit.getMember().getCompanyName();
+        this.uploader = recruit.getMember().getMemberEmail();
         this.title = recruit.getRecruitTitle();
         this.contents = recruit.getRecruitContent();
         this.keywordStandard = recruit.getKeywordStandard();
