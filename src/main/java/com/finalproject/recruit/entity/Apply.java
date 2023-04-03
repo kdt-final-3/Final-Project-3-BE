@@ -139,5 +139,28 @@ public class Apply extends BaseTime {
      * */
     private boolean terms;
 
+    /**
+     * 채용단계 변경
+     * @param applyProcedure
+     */
+    public void changeProcedure(ApplyProcedure applyProcedure) {
+        this.applyProcedure = applyProcedure;
+    }
+
+    /**
+     * 합격 처리
+     */
+    public void changePass() {
+        this.pass = true;
+        this.passDay = LocalDateTime.now();
+    }
+
+    /**
+     * 불합격 처리
+     */
+    public void cancelPass() {
+        this.pass = false;
+    }
+
 
 }
