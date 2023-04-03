@@ -192,4 +192,25 @@ public class ApplyManageService {
 
         return response.success("지원자 코멘트 등록에 성공하였습니다.");
     }
+
+    /**
+     * 지원자 찜 등록 / 해제 기능
+     * @param applyId
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> changeWish(Long applyId) {
+        try {
+            Apply findApply = applyRepository.findByApplyId(applyId).get();
+            if (!findApply.isWish()) {
+                findApply.changeWish();
+            } else {
+                findApply.cancelWish();
+            }
+        } catch (Exception e) {
+            return response.fail("지원자 찜 등록 / 해제 실패했습니다.");
+        }
+
+        return response.success("지원지 찜 등록 / 해제 성공하였습니다.");
+    }
 }

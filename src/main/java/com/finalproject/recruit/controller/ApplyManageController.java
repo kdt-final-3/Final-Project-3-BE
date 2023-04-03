@@ -67,10 +67,22 @@ public class ApplyManageController {
         return applyManageService.findApplicantDetail(applyId);
     }
 
+    /**
+     * 지원자 코멘트 등록
+     */
     @PutMapping("/apply/note/{applyId}")
     public ResponseEntity<?> writeEvaluation(@PathVariable Long applyId,
                                              @RequestParam(name = "evaluation") String evaluation) {
 
         return applyManageService.writeEvaluation(applyId, evaluation);
+    }
+
+    /**
+     * 지원자 찜 등록 / 해제
+     */
+    @PutMapping("/apply/wish/{applyId}")
+    public ResponseEntity<?> changeWish(@PathVariable Long applyId) {
+
+        return applyManageService.changeWish(applyId);
     }
 }

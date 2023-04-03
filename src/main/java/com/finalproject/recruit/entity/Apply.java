@@ -214,5 +214,19 @@ public class Apply extends BaseTime {
         this.evaluation = evaluation;
     }
 
+    /**
+     * 찜 처리
+     */
+    public void changeWish() {
+        this.wish = true;
+    }
+
+    /**
+     * 찜 해제
+     */
+    public void cancelWish() {
+        this.wish = false;
+    }
+
 
 }
