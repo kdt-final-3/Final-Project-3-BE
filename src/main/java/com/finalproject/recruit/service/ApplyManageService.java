@@ -2,7 +2,9 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
+import com.finalproject.recruit.dto.applymanage.CountAndDateResponseDTO;
 import com.finalproject.recruit.entity.Apply;
+import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.parameter.ApplyProcedure;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
@@ -11,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 public class ApplyManageService {
 
     private final ApplyRepository applyRepository;
+    private final RecruitRepository recruitRepository;
     private final Response response;
 
     /**
@@ -90,5 +95,71 @@ public class ApplyManageService {
         }
 
         return response.success("지원자 합격 / 불합격 처리에 성공하였습니다.");
+    }
+
+    /**
+     * 인재현황 (총 지원자 수, 오늘 지원자 수, 현재 채용폼의 채용단계, 채용단계마감 디데이)
+     * @param recruitId
+     * @return
+     */
+    public ResponseEntity<?> countApplicantAndProcessAndTime(Long recruitId) {
+        CountAndDateResponseDTO result = new CountAndDateResponseDTO();
+
+        Long totalCount = applyRepository.countApplicantByRecruitId(recruitId); //총 지원자 수 계산
+        result.setTotalCount(totalCount);
+
+        LocalDateTime now = LocalDateTime.now();
+        Long todayCount = applyRepository.countApplicantByRecruitIdAndCreatedTime(recruitId, now.toLocalDate()); // 오늘 지원자 수 계산
+        result.setTodayCount(todayCount);
+
+        Recruit findRecruit = recruitRepository.findByRecruitId(recruitId).get();
+        if (now.isBefore(findRecruit.getDocsStart())) { //오늘 날짜가 서류 시작일 전이면 채용 시작 전
+
+            result.setProcess("채용 시작 전");
+
+            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsStart().toLocalDate()); //날짜 차이 계산
+            result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "남았습니다.");
+
+        } else if (now.isAfter(findRecruit.getDocsStart()) && now.isBefore(findRecruit.getDocsEnd())) {
+
+            result.setProcess("서류전형");
+
+            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsEnd().toLocalDate()); //날짜 차이 계산
+            result.setProcessFinish("서류전형 마감까지 " + diffDate.getDays() + "일 남았습니다.");
+
+        } else if (now.isAfter(findRecruit.getDocsEnd()) && now.isBefore(findRecruit.getMeetStart())) {
+
+            result.setProcess("서류전형 마감");
+
+            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetStart().toLocalDate()); //날짜 차이 계산
+            result.setProcessFinish("면접전형 시작까지 " + diffDate.getDays() + "일 남았습니다.");
+
+        } else if (now.isAfter(findRecruit.getMeetStart()) && now.isBefore(findRecruit.getMeetEnd())) {
+
+            result.setProcess("면접 진행 중");
+
+            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetEnd().toLocalDate()); //날짜 차이 계산
+            result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "남았습니다.");
+
+        } else if (now.isAfter(findRecruit.getMeetEnd()) && now.isBefore(findRecruit.getConfirmStart())) {
+
+            result.setProcess("면접 종료");
+
+            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmStart().toLocalDate()); //날짜 차이 계산
+            result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "남았습니다.");
+
+        } else if (now.isAfter(findRecruit.getConfirmStart()) && now.isBefore(findRecruit.getConfirmEnd())) {
+
+            result.setProcess("최종 조율 중");
+
+            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmEnd().toLocalDate()); //날짜 차이 계산
+            result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "남았습니다.");
+
+        } else {
+            result.setProcess("채용마감");
+            result.setProcessFinish("채용이 마감되었습니다.");
+        }
+
+        return response.success(result);
     }
 }
