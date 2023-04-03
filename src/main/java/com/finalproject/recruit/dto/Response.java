@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-
 @Component
-public class Response {
+public class Response<T> {
+
+    /*===========================
+       Response 구성
+    ===========================*/
 
     @Getter
     @Builder
@@ -20,104 +20,66 @@ public class Response {
         private String result;
         private String message;
         private Object data;
-        private Object error;
     }
+
+    /*===========================
+       Success
+    ===========================*/
+
+    // Constructor
     public ResponseEntity<?> success(Object data, String msg, HttpStatus status){
         Body body = Body.builder()
                 .state(status.value())
-                .data(data)
-                .result("success")
+                .result("SUCCESS")
                 .message(msg)
-                .error(Collections.emptyList())
+                .data(data)
                 .build();
         return ResponseEntity.ok(body);
     }
-    /**
-     * <p>메세지만 가진 성공 응답을 반환한다</p>
-     * <pre>
-     *     {
-     *         "state" : 200,
-     *         "result" : success,
-     *         "message" : message,
-     *         "data" : [],
-     *         "error" : []
-     *     }
-     * </pre>
-     * @param msg 응답 바디 message  필드에 포함될 정보
-     * @return 응답 객체
-     */
+
+    // Return Type : state & msg
     public ResponseEntity<?> success(String msg) {
-        return success(Collections.emptyList(), msg, HttpStatus.OK);
+        return success(null, msg, HttpStatus.OK);
     }
-    public ResponseEntity<?> fail(String msg) {
-        return fail(Collections.emptyList(), msg, HttpStatus.BAD_REQUEST);
-    }
-    /**
-     * <p> 데이터만 가진 성공 응답을 반환한다.</p>
-     * <pre>
-     *     {
-     *         "state" : 200,
-     *         "result" : success,
-     *         "message" : null,
-     *         "data" : [{data1}, {data2}...],
-     *         "error" : []
-     *     }
-     * </pre>
-     *
-     * @param data 응답 바디 data 필드에 포함될 정보
-     * @return 응답 객체
-     */
+
+    // Return Type : state & objet
     public ResponseEntity<?> success(Object data) {
         return success(data, null, HttpStatus.OK);
     }
-    /**
-     * <p> 성공 응답만 반환한다. </p>
-     * <pre>
-     *     {
-     *         "state" : 200,
-     *         "result" : success,
-     *         "message" : null,
-     *         "data" : [],
-     *         "error" : []
-     *     }
-     * </pre>
-     *
-     * @return 응답 객체
-     */
+
+    // Return Type : state
     public ResponseEntity<?> success() {
-        return success(Collections.emptyList(), null, HttpStatus.OK);
+        return success(null, null, HttpStatus.OK);
     }
 
+    /*===========================
+       Fail
+    ===========================*/
+
+    // Constructor
     public ResponseEntity<?> fail(Object data, String msg, HttpStatus status) {
         Body body = Body.builder()
                 .state(status.value())
-                .data(data)
-                .result("fail")
+                .result("FAIL")
                 .message(msg)
-                .error(Collections.emptyList())
+                .data(data)
                 .build();
-        return ResponseEntity.ok(body);
+        return ResponseEntity.internalServerError().body(body);
     }
 
-    /**
-     * <p> 메세지를 가진 실패 응답을 반환한다. </p>
-     * <pre>
-     *     {
-     *         "state" : HttpStatus Code,
-     *         "result" : fail,
-     *         "message" : message,
-     *         "data" : [],
-     *         "error" : [{error1}, {error2}...]
-     *     }
-     * </pre>
-     *
-     * @param msg 응답 바디 message 필드에 포함될 정보
-     * @param status 응답 바디 status 필드에 포함될 응답 상태 코드
-     * @return 응답 객체
-     */
+    // Return Type : state & msg
     public ResponseEntity<?> fail(String msg, HttpStatus status) {
-        return fail(Collections.emptyList(), msg, status);
+        return fail(null, msg, status);
     }
+
+    // Return Type : msg
+    public ResponseEntity<?> fail(String msg) {
+        return fail(null, msg, HttpStatus.BAD_REQUEST);
+    }
+
+    /*===========================
+       Archive
+    ===========================
 
     public ResponseEntity<?> invalidFields(LinkedList<LinkedHashMap<String, String>> errors) {
         Body body = Body.builder()
@@ -129,4 +91,5 @@ public class Response {
                 .build();
         return ResponseEntity.ok(body);
     }
+    */
 }

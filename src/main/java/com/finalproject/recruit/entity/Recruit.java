@@ -1,16 +1,16 @@
 package com.finalproject.recruit.entity;
 
 import com.finalproject.recruit.dto.recruit.RecruitReq;
-import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.parameter.Procedure;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
@@ -170,7 +170,8 @@ public class Recruit {
         변환 메소드
      ===========================*/
     // 신규 채용폼 등록
-    public Recruit(RecruitReq req) {
+    public Recruit(RecruitReq req, Member member) {
+        this.member = member;
         this.recruitTitle = req.getTitle();
         this.recruitContent = req.getContents();
         this.keywordStandard = req.getKeywordStandard();

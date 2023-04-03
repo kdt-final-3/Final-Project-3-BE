@@ -12,8 +12,8 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
         채용폼
     ===========================*/
     Optional<Recruit> findByRecruitId(Long recruitId);
-    List<Recruit> findAllByRecruitOngoing(boolean status);
-    List<Recruit> findAllByRecruitOngoingAndRecruitTitleContains(boolean status, String title);
+    List<Recruit> findAllByMember_MemberEmailAndRecruitOngoing(String email, boolean status);
+    List<Recruit> findAllByMember_MemberEmailAndRecruitOngoingAndRecruitTitleContains(String email, boolean status, String title);
 
     /*===========================
         탈락인재 & 알람 & 지원자
