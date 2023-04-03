@@ -26,7 +26,6 @@ public class ApplicantService {
     private final CertificateRepository certificateRepository;
     private final EducationRepository educationRepository;
     private final LanguageRepository languageRepository;
-    private final MilitaryRepository militaryRepository;
 
     private final Response response;
 
@@ -49,7 +48,6 @@ public class ApplicantService {
             certificateRepository.save(applicationReq.toCertificate(apply));
             educationRepository.save(applicationReq.toEducation(apply));
             languageRepository.save(applicationReq.toLanguage(apply));
-            militaryRepository.save(applicationReq.toMilitary(apply));
 
             return response.success("지원서 제출에 성공했습니다.");
         } catch (Exception e) {
