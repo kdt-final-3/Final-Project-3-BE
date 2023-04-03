@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,5 +31,15 @@ public class ApplyManageController {
                                                       @PathVariable String procedure) {
 
         return applyManageService.findApplicantByProcedure(recruitId, procedure);
+    }
+
+    /**
+     * 지원자 채용단계 변경
+     */
+    @PutMapping("/manage/change/{applyId}/{procedure}")
+    public ResponseEntity<?> changeApplyProcedure(@PathVariable Long applyId,
+                                                  @PathVariable String procedure) {
+
+        return applyManageService.changeApplyProcedure(applyId, procedure);
     }
 }

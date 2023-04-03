@@ -139,5 +139,13 @@ public class Apply extends BaseTime {
      * */
     private boolean terms;
 
+    /**
+     * 채용단계 변경
+     * @param applyProcedure
+     */
+    public void changeProcedure(ApplyProcedure applyProcedure) {
+        this.applyProcedure = applyProcedure;
+    }
+
 
 }
