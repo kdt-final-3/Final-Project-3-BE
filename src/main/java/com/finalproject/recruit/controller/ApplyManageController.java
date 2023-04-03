@@ -3,10 +3,7 @@ package com.finalproject.recruit.controller;
 import com.finalproject.recruit.service.ApplyManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,9 +58,19 @@ public class ApplyManageController {
         return applyManageService.countApplicantAndProcessAndTime(recruitId);
     }
 
+    /**
+     * 지원자 상세조회
+     */
     @GetMapping("/apply/{applyId}")
     public ResponseEntity<?> findApplicantDetail(@PathVariable Long applyId) {
 
         return applyManageService.findApplicantDetail(applyId);
+    }
+
+    @PutMapping("/apply/note/{applyId}")
+    public ResponseEntity<?> writeEvaluation(@PathVariable Long applyId,
+                                             @RequestParam(name = "evaluation") String evaluation) {
+
+        return applyManageService.writeEvaluation(applyId, evaluation);
     }
 }

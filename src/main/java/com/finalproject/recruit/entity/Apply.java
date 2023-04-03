@@ -207,5 +207,12 @@ public class Apply extends BaseTime {
         this.pass = false;
     }
 
+    /**
+     * 코멘트 등록
+     */
+    public void writeEvaluation(String evaluation) {
+        this.evaluation = evaluation;
+    }
+
 
 }

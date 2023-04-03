@@ -174,4 +174,22 @@ public class ApplyManageService {
 
         return response.success(data);
     }
+
+    /**
+     * 지원자 코멘트 등록
+     * @param applyId
+     * @param evaluation
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> writeEvaluation(Long applyId, String evaluation) {
+        try {
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            findApply.writeEvaluation(evaluation);
+        } catch (Exception e) {
+            return response.fail("지원자 코멘트 등록에 실패하였습니다.");
+        }
+
+        return response.success("지원자 코멘트 등록에 성공하였습니다.");
+    }
 }
