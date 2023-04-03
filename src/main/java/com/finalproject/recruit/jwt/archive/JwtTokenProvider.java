@@ -1,4 +1,4 @@
-package com.finalproject.recruit.jwt;
+package com.finalproject.recruit.jwt.archive;
 
 import com.finalproject.recruit.dto.member.MemberReqDTO;
 import com.finalproject.recruit.dto.member.MemberResDTO;
@@ -57,7 +57,6 @@ public class JwtTokenProvider {
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
         return MemberResDTO.TokenInfo.builder()
-                .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)

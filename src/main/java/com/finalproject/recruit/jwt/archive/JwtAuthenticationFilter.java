@@ -1,4 +1,4 @@
-package com.finalproject.recruit.jwt;
+package com.finalproject.recruit.jwt.archive;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

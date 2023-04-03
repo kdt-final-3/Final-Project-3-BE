@@ -70,40 +70,6 @@ public class Member {
     private boolean memberDelete;
 
 
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        List<String> roles = new ArrayList<>();
-//        roles.add("MEMBER");
-//        return roles.stream()
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public String getUsername() {
-//        return memberEmail;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return false;
-//    }
-
     public void resetPassword(String password) {
         this.password = password;
     }
@@ -117,4 +83,43 @@ public class Member {
     public void dropMember() {
         this.memberDelete = true;
     }
+
+    /*===========================
+        Token Related
+     ===========================≈
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<String> roles = new ArrayList<>();
+        roles.add("MEMBER");
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return memberEmail;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+     */
 }
