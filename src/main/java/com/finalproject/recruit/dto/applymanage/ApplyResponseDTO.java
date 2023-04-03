@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,6 +25,9 @@ public class ApplyResponseDTO {
     LocalDateTime createdTime;
     Boolean applyDelete;
     Boolean wish;
+    String keywords;
+    int score;
+    List<String> keywordList;
 
     public ApplyResponseDTO(Apply apply) {
         this.applyId = apply.getApplyId();
@@ -35,5 +39,6 @@ public class ApplyResponseDTO {
         this.createdTime = apply.getCreatedTime();
         this.applyDelete = apply.isApplyDelete();
         this.wish = apply.isWish();
+        this.keywords = apply.getKeywordSelect();
     }
 }
