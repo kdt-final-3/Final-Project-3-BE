@@ -51,4 +51,13 @@ public class ApplyManageController {
 
         return applyManageService.changePassOrFail(applyId);
     }
+
+    /**
+     * 총 지원자 수, 오늘 지원자 수, 채용공고의 채용단계, 채용단계 마감 D-day
+     */
+    @GetMapping("/manage/status/{recruitId}")
+    public ResponseEntity<?> countApplicantAndProcessAndTime(@PathVariable Long recruitId) {
+
+        return applyManageService.countApplicantAndProcessAndTime(recruitId);
+    }
 }
