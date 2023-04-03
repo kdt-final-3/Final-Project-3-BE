@@ -85,4 +85,13 @@ public class ApplyManageController {
 
         return applyManageService.changeWish(applyId);
     }
+
+    /**
+     * 지원자 탈락인재 보관함 이동
+     */
+    @PutMapping("/apply/drop/{applyId}")
+    public ResponseEntity<?> dropApply(@PathVariable Long applyId) {
+
+        return applyManageService.dropApply(applyId);
+    }
 }

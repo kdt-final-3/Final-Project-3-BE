@@ -201,7 +201,7 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> changeWish(Long applyId) {
         try {
-            Apply findApply = applyRepository.findByApplyId(applyId).get();
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
             if (!findApply.isWish()) {
                 findApply.changeWish();
             } else {
@@ -212,5 +212,26 @@ public class ApplyManageService {
         }
 
         return response.success("지원지 찜 등록 / 해제 성공하였습니다.");
+    }
+
+    /**
+     * 탈락인재 보관함 이동
+     * @param applyId
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> dropApply(Long applyId) {
+        try {
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            if (!findApply.isFailApply()) {
+                findApply.changeDrop();
+            } else {
+                findApply.cancelDrop();
+            }
+        } catch (Exception e) {
+            return response.fail("탈락인재 보관함 등록 / 해제 실패하였습니다.");
+        }
+
+        return response.success("탈락인재 보관함 등록 / 해제 성공하였습니다.");
     }
 }

@@ -228,5 +228,18 @@ public class Apply extends BaseTime {
         this.wish = false;
     }
 
+    /**
+     * 탈락인재 처리
+     */
+    public void changeDrop() {
+        this.failApply = true;
+    }
+
+    /**
+     * 탈락인재 해제
+     */
+    public void cancelDrop() {
+        this.failApply = false;
+    }
 
 }
