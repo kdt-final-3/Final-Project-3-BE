@@ -207,5 +207,39 @@ public class Apply extends BaseTime {
         this.pass = false;
     }
 
+    /**
+     * 코멘트 등록
+     */
+    public void writeEvaluation(String evaluation) {
+        this.evaluation = evaluation;
+    }
+
+    /**
+     * 찜 처리
+     */
+    public void changeWish() {
+        this.wish = true;
+    }
+
+    /**
+     * 찜 해제
+     */
+    public void cancelWish() {
+        this.wish = false;
+    }
+
+    /**
+     * 탈락인재 처리
+     */
+    public void changeDrop() {
+        this.failApply = true;
+    }
+
+    /**
+     * 탈락인재 해제
+     */
+    public void cancelDrop() {
+        this.failApply = false;
+    }
 
 }

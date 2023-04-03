@@ -174,4 +174,64 @@ public class ApplyManageService {
 
         return response.success(data);
     }
+
+    /**
+     * 지원자 코멘트 등록
+     * @param applyId
+     * @param evaluation
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> writeEvaluation(Long applyId, String evaluation) {
+        try {
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            findApply.writeEvaluation(evaluation);
+        } catch (Exception e) {
+            return response.fail("지원자 코멘트 등록에 실패하였습니다.");
+        }
+
+        return response.success("지원자 코멘트 등록에 성공하였습니다.");
+    }
+
+    /**
+     * 지원자 찜 등록 / 해제 기능
+     * @param applyId
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> changeWish(Long applyId) {
+        try {
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            if (!findApply.isWish()) {
+                findApply.changeWish();
+            } else {
+                findApply.cancelWish();
+            }
+        } catch (Exception e) {
+            return response.fail("지원자 찜 등록 / 해제 실패했습니다.");
+        }
+
+        return response.success("지원지 찜 등록 / 해제 성공하였습니다.");
+    }
+
+    /**
+     * 탈락인재 보관함 이동
+     * @param applyId
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> dropApply(Long applyId) {
+        try {
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            if (!findApply.isFailApply()) {
+                findApply.changeDrop();
+            } else {
+                findApply.cancelDrop();
+            }
+        } catch (Exception e) {
+            return response.fail("탈락인재 보관함 등록 / 해제 실패하였습니다.");
+        }
+
+        return response.success("탈락인재 보관함 등록 / 해제 성공하였습니다.");
+    }
 }
