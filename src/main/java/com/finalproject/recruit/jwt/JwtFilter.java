@@ -43,10 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try{
             // 토큰 검증 & 검증유저 return
             AuthDTO member = jwtManager.getMemberInfoOf(header).orElseThrow(
-                    () -> new AuthException(
-                            ErrorCode.INVALID_TOKEN,
-                            String.format("Request Header's Invalid")
-                    ));
+                    () -> new AuthException(ErrorCode.INVALID_TOKEN));
 
             // 검증정보 Controller return
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -61,7 +58,6 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         filterChain.doFilter(request, response);
     }
 }

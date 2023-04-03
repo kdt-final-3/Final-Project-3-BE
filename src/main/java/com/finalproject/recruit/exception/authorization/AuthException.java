@@ -17,11 +17,14 @@ public class AuthException extends RuntimeException{
     @Override
     public String getMessage(){
         if(message == null){
-            return errorCode.getMessage();
+            return "{" +
+                    "\"state\":" + "\"" + errorCode.getStatus() + "\"" + "\n" +
+                    "\t" + "\"message\":" + errorCode.getMessage() +
+                    "}";
         }
         return "{" +
                 "\"state\":" + "\"" + errorCode.getStatus() + "\"" + "\n" +
-                "\t" + "\"message\":" + errorCode.getMessage() +
+                "\t" + "\"message\":" + message +
                 "}";
     }
 }
