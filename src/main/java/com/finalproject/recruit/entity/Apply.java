@@ -166,8 +166,9 @@ public class Apply extends BaseTime {
     /**
      * 병역사항
      */
-    @OneToOne(mappedBy = "apply")
-    private Military military;
+    @Column(name = "military")
+    @Enumerated(EnumType.STRING)
+    private MilitaryEnum military;
 
     /**
      * 자격증

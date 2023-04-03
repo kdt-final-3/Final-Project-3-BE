@@ -41,12 +41,7 @@ public class ApplyDetailResponseDTO {
     String languageName;
     String languageSkill;
     LanguageLevel languageLevel;
-    LocalDateTime militaryStart;
-    LocalDateTime militaryEnd;
-    MilitaryDivision militaryDivision;
-    MilitaryCategory militaryCategory;
-    MilitaryClass militaryClass;
-    String militaryExemption;
+    MilitaryEnum militaryEnum;
     String certificateName;
     LocalDateTime certificateDate;
     String certificatePublisher;
@@ -84,12 +79,7 @@ public class ApplyDetailResponseDTO {
         this.languageName = apply.getLanguage().getLanguageName();
         this.languageSkill = apply.getLanguage().getLanguageSkill();
         this.languageLevel = apply.getLanguage().getLanguageLevel();
-        this.militaryStart = apply.getMilitary().getMilitaryStart();
-        this.militaryEnd = apply.getMilitary().getMilitaryEnd();
-        this.militaryDivision = apply.getMilitary().getMilitaryDivision();
-        this.militaryCategory = apply.getMilitary().getMilitaryCategory();
-        this.militaryClass = apply.getMilitary().getMilitaryClass();
-        this.militaryExemption = apply.getMilitary().getMilitaryExemption();
+        this.militaryEnum = apply.getMilitaryEnum();
         this.certificateName = apply.getCertificate().getCertificateName();
         this.certificateDate = apply.getCertificate().getCertificateDate();
         this.certificatePublisher = apply.getCertificate().getCertificatePublisher();

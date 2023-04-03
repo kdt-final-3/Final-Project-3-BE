@@ -73,12 +73,6 @@ public class ApplicationReq {
         private String languageSkill;
         private LanguageLevel languageLevel;
 
-        private LocalDateTime militaryStart;
-        private LocalDateTime militaryEnd;
-        private MilitaryDivision militaryDivision;
-        private MilitaryCategory militaryCategory;
-        private MilitaryClass militaryClass;
-        private String militaryExemption;
 
 
         public Apply toApply(Recruit recruit){
@@ -169,16 +163,5 @@ public class ApplicationReq {
                         .build();
         }
 
-        public Military toMilitary(Apply apply){
-                return Military.builder()
-                        .apply(apply)
-                        .militaryStart(militaryStart)
-                        .militaryEnd(militaryEnd)
-                        .militaryDivision(militaryDivision)
-                        .militaryCategory(militaryCategory)
-                        .militaryClass(militaryClass)
-                        .militaryExemption(militaryExemption)
-                        .build();
-        }
 
 }
