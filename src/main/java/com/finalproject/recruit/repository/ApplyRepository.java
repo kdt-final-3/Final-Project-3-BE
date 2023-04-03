@@ -1,6 +1,7 @@
 package com.finalproject.recruit.repository;
 
 import com.finalproject.recruit.entity.Apply;
+import com.finalproject.recruit.parameter.ApplyProcedure;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     Optional<Apply> findByApplyEmail(String email);
 
-
+    List<Apply> findByRecruit_RecruitIdAndApplyProcedure(Long recruitId, ApplyProcedure applyProcedure);
 
 
 }
