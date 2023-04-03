@@ -249,4 +249,11 @@ public class Apply extends BaseTime {
         this.meeting = meeting;
     }
 
+    /**
+     * 서류검토 처리
+     */
+    public void setCheckApply() {
+        this.checkApply = LocalDateTime.now();
+    }
+
 }

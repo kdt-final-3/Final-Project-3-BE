@@ -246,12 +246,29 @@ public class ApplyManageService {
         try {
             LocalDateTime meetingDay = LocalDateTime.parse(meeting);
 
-            Apply findApply = applyRepository.findByApplyId(applyId).get();
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
             findApply.setMeeting(meetingDay);
         } catch (Exception e) {
             return response.fail("면접일자 등록에 실패하였습니다.");
         }
 
         return response.success("면접일자 등록에 성공하였습니다.");
+    }
+
+    /**
+     * 인재 서류검토 처리
+     * @param applyId
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> checkApplicant(Long applyId) {
+        try {
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            findApply.setCheckApply();
+        } catch (Exception e) {
+            return response.fail("서류검토 처리에 실패하였습니다.");
+        }
+
+        return response.success("서류검토 처리에 성공하였습니다.");
     }
 }

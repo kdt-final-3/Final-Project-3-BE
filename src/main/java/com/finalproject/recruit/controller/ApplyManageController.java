@@ -104,4 +104,13 @@ public class ApplyManageController {
 
         return applyManageService.setMeetDay(applyId, meeting);
     }
+
+    /**
+     * 지원자 서류검토 처리
+     */
+    @PutMapping("/apply/check/{applyId}")
+    public ResponseEntity<?> checkApplicant(@PathVariable Long applyId) {
+
+        return applyManageService.checkApplicant(applyId);
+    }
 }
