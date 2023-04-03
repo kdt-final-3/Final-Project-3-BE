@@ -2,6 +2,7 @@ package com.finalproject.recruit.repository;
 
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.parameter.ApplyProcedure;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,5 +33,6 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
     @Query("select count(a) from Apply a where a.recruit.recruitId = :id and DATE_FORMAT(a.createdTime, '%Y-%m-%d') = DATE_FORMAT(:today, '%Y-%m-%d') and a.applyDelete = false")
     Long countApplicantByRecruitIdAndCreatedTime(@Param("id") Long id, @Param("today") LocalDate today);
 
-
+    @EntityGraph(attributePaths = {"career","education","language","military","certificate","activities","awards"})
+    Optional<Apply> findJoinByApplyId(Long applyId);
 }

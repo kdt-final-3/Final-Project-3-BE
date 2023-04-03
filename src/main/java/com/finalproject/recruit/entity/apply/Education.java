@@ -5,12 +5,14 @@ import com.finalproject.recruit.parameter.EduStatus;
 import com.finalproject.recruit.parameter.EduYear;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table
 @AllArgsConstructor
 @NoArgsConstructor

@@ -60,4 +60,10 @@ public class ApplyManageController {
 
         return applyManageService.countApplicantAndProcessAndTime(recruitId);
     }
+
+    @GetMapping("/apply/{applyId}")
+    public ResponseEntity<?> findApplicantDetail(@PathVariable Long applyId) {
+
+        return applyManageService.findApplicantDetail(applyId);
+    }
 }

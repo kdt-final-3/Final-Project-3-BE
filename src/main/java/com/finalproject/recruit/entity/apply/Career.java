@@ -4,12 +4,14 @@ package com.finalproject.recruit.entity.apply;
 import com.finalproject.recruit.entity.Apply;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table
 @AllArgsConstructor
 @NoArgsConstructor

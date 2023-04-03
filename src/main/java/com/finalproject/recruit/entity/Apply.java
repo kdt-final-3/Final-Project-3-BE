@@ -1,5 +1,6 @@
 package com.finalproject.recruit.entity;
 
+import com.finalproject.recruit.entity.apply.*;
 import com.finalproject.recruit.parameter.MilitaryEnum;
 import com.finalproject.recruit.parameter.ApplyProcedure;
 import com.finalproject.recruit.util.BaseTime;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -138,6 +140,49 @@ public class Apply extends BaseTime {
      * 약관
      * */
     private boolean terms;
+
+    /**
+     * 경력
+     */
+    @OneToOne(mappedBy = "apply")
+    private Career career;
+
+
+    /**
+     * 학력
+     */
+    @OneToOne(mappedBy = "apply")
+    private Education education;
+
+    /**
+     * 어학
+     */
+    @OneToOne(mappedBy = "apply")
+    private Language language;
+
+    /**
+     * 병역사항
+     */
+    @OneToOne(mappedBy = "apply")
+    private Military military;
+
+    /**
+     * 자격증
+     */
+    @OneToOne(mappedBy = "apply")
+    private Certificate certificate;
+
+    /**
+     * 대외활동
+     */
+    @OneToOne(mappedBy = "apply")
+    private Activities activities;
+
+    /**
+     * 수상
+     */
+    @OneToOne(mappedBy = "apply")
+    private Awards awards;
 
     /**
      * 채용단계 변경
