@@ -147,6 +147,9 @@ public class Apply extends BaseTime {
     @OneToOne(mappedBy = "apply")
     private Career career;
 
+    public void setPaperSubmit(){
+        this.applyProcedure = ApplyProcedure.서류제출;
+    }
 
     /**
      * 학력
@@ -198,6 +201,7 @@ public class Apply extends BaseTime {
     public void changePass() {
         this.pass = true;
         this.passDay = LocalDateTime.now();
+        this.failApply = false;
     }
 
     /**
@@ -205,6 +209,7 @@ public class Apply extends BaseTime {
      */
     public void cancelPass() {
         this.pass = false;
+        this.failApply = true;
     }
 
     /**

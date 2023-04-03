@@ -14,6 +14,8 @@ import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.MailRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -44,16 +46,14 @@ public class NoticeService {
         return response.success(noticeRecruitsRes);
     }
 
-    public ResponseEntity<?> applicantList(Long recruitId) {
+    public ResponseEntity<?> applicantList(Long recruitId, Pageable pageable) {
 
-        List<ApplicantsRes> applicantsRes = applyRepository.findByRecruitRecruitId(recruitId)
-                .stream()
+        Page<ApplicantsRes> applicantsRes = applyRepository.findByRecruitRecruitId(recruitId, pageable)
                 .map(apply -> ApplicantsRes.fromApply(
                         apply,
                         mailRepository.findTopByApplyApplyIdOrderByCreatedTimeDesc(apply.getApplyId())
                                 .map(Mail::getCreatedTime)
-                                .orElse(null)))
-                .collect(Collectors.toList());
+                                .orElse(null)));
         return response.success(applicantsRes);
 
     }

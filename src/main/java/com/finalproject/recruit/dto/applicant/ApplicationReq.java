@@ -31,7 +31,7 @@ public class ApplicationReq {
 
         private String applyResume;
 
-        private List<Boolean> keywordsReq;
+        private String keywordsReq;
 
         /**
          * 우대사항 관련
@@ -90,7 +90,7 @@ public class ApplicationReq {
                         .resumeContent(resumeContent)
                         .applyPortfolio(applyPortfolio)
                         .applyResume(applyResume)
-                        .keywordSelect(keywordToString(keywordsReq))
+                        .keywordSelect(keywordsReq)
                         .disorder(disorder)
                         .veteran(veteran)
                         .employment(employment)
@@ -161,8 +161,6 @@ public class ApplicationReq {
         }
 
         public Language toLanguage(Apply apply){
-                System.out.println("이거는?");
-                System.out.println(languageLevel);
                 return Language.builder()
                         .apply(apply)
                         .languageName(languageName)
