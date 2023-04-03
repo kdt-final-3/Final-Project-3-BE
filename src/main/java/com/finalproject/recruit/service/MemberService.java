@@ -6,16 +6,20 @@ import com.finalproject.recruit.dto.member.MemberResDTO;
 import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.jwt.JwtManager;
 import com.finalproject.recruit.jwt.JwtProperties;
+import com.finalproject.recruit.repository.MailRepository;
 import com.finalproject.recruit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -32,6 +36,11 @@ public class MemberService {
     private final PasswordEncoder encoder;
 
     private final JwtManager manager;
+
+    private final MailRepository mailRepository;
+
+    private final JavaMailSender mailSender;
+
 
     private static final String pattern = "^[A-Za-z[0-9]]{8,16}$"; // 영문, 숫자 8~16자리
 
@@ -196,5 +205,60 @@ public class MemberService {
 
     private boolean checkPassword(String input, String origin) {
         return encoder.matches(input, origin);
+    }
+
+
+
+
+    /**
+     * 인증번호 발송
+     */
+    public ResponseEntity<?> sendAuthNumber(String memberEmail) {
+        Random random = new Random();
+        int createNum = 0;
+        String ranNum = "";
+        int letter = 6;
+        String resultNum = "";
+        for (int i = 0; i < letter; i++) {
+            createNum = random.nextInt(9);
+            ranNum = Integer.toString(createNum);
+            resultNum += ranNum;
+        }
+        try {
+            SimpleMailMessage authNum = new SimpleMailMessage();
+            authNum.setSubject(memberEmail + " 인증 번호입니다.");
+            authNum.setTo(memberEmail);
+            authNum.setText(resultNum);
+            System.out.println(authNum.toString());
+            mailSender.send(authNum);
+            redisTemplate.opsForValue()
+                    .set("Auth : " + memberEmail, resultNum, 3 * 60 * 1800L, TimeUnit.MILLISECONDS);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("다시 시도하여 주십시오.");
+        }
+        return response.success();
+    }
+
+    /**
+     * 인증번호 인증
+     */
+    public ResponseEntity<?> numberAuth(MemberReqDTO.AuthMail authMail) {
+        String memberEmail = authMail.getMemberEmail();
+        String authNum = authMail.getAuthNumber();
+        if (redisTemplate.opsForValue().get("Auth : " + memberEmail) == null) {
+            return response.fail("만료되었습니다. 다시 인증을 시도하여 주십시오.");
+        }
+
+        String correctAuth = redisTemplate.opsForValue().get("Auth : " + memberEmail).toString();
+        if (correctAuth.equals(authNum)) {
+
+            redisTemplate.delete("Auth : " + memberEmail);
+            return response.success();
+        }
+        else {
+            return response.fail("잘못된 인증 번호입니다.");
+        }
     }
 }

@@ -91,4 +91,16 @@ public class MemberController {
         String memberEmail = ((AuthDTO) authentication.getPrincipal()).getMemberEmail();
         return memberService.dropMember(memberEmail);
     }
+
+    @PostMapping("/auth/number")
+    public ResponseEntity<?> sendAuthNumber(@RequestParam("memberEmail") String memberEmail) {
+        System.out.println(memberEmail);
+        return memberService.sendAuthNumber(memberEmail);
+    }
+
+    @GetMapping("/auth/number")
+    public ResponseEntity<?> authNumber(@RequestBody MemberReqDTO.AuthMail authMail) {
+        return memberService.numberAuth(authMail);
+    }
+
 }
