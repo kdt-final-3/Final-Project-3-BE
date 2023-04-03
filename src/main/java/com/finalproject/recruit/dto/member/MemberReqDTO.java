@@ -1,5 +1,6 @@
 package com.finalproject.recruit.dto.member;
 
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -84,5 +85,17 @@ public class MemberReqDTO {
 
         private String ceoName;
 
+    }
+
+    /**
+     * 회원가입 시 이메일 인증
+     */
+    @Getter
+    @Setter
+    public static class AuthMail {
+
+        private String memberEmail;
+
+        private String authNumber;
     }
 }
