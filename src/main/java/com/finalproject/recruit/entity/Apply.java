@@ -201,6 +201,7 @@ public class Apply extends BaseTime {
     public void changePass() {
         this.pass = true;
         this.passDay = LocalDateTime.now();
+        this.failApply = false;
     }
 
     /**
@@ -208,6 +209,7 @@ public class Apply extends BaseTime {
      */
     public void cancelPass() {
         this.pass = false;
+        this.failApply = true;
     }
 
     /**
