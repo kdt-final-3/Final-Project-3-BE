@@ -42,4 +42,13 @@ public class ApplyManageController {
 
         return applyManageService.changeApplyProcedure(applyId, procedure);
     }
+
+    /**
+     * 지원자 합격 / 불합격 처리
+     */
+    @PutMapping("/manage/pass/{applyId}")
+    public ResponseEntity<?> changePassOrFail(@PathVariable Long applyId) {
+
+        return applyManageService.changePassOrFail(applyId);
+    }
 }

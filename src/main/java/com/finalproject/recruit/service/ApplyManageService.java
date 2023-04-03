@@ -69,4 +69,26 @@ public class ApplyManageService {
 
         return response.success("채용단계 수정에 성공하였습니다.");
     }
+
+    /**
+     * 지원자 합격 또는 불합격 처리
+     * @param applyId
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> changePassOrFail(Long applyId) {
+        try {
+            Apply findApply = applyRepository.findByApplyId(applyId).get();
+
+            if (!findApply.isPass()) {
+                findApply.changePass();
+            } else {
+                findApply.cancelPass();
+            }
+        } catch (Exception e) {
+            return response.fail("지원자 합격 / 불합격 처리에 실패했습니다.");
+        }
+
+        return response.success("지원자 합격 / 불합격 처리에 성공하였습니다.");
+    }
 }
