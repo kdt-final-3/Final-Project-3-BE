@@ -147,6 +147,9 @@ public class Apply extends BaseTime {
     @OneToOne(mappedBy = "apply")
     private Career career;
 
+    public void setPaperSubmit(){
+        this.applyProcedure = ApplyProcedure.서류제출;
+    }
 
     /**
      * 학력
