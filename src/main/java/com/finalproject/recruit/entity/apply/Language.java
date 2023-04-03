@@ -5,11 +5,13 @@ import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.parameter.LanguageLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @Table
 @AllArgsConstructor
 @NoArgsConstructor

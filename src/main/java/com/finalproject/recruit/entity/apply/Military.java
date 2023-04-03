@@ -6,12 +6,14 @@ import com.finalproject.recruit.parameter.MilitaryClass;
 import com.finalproject.recruit.parameter.MilitaryDivision;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table
 @AllArgsConstructor
 @NoArgsConstructor

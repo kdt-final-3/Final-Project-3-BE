@@ -1,6 +1,7 @@
 package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
+import com.finalproject.recruit.dto.applymanage.ApplyDetailResponseDTO;
 import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
 import com.finalproject.recruit.dto.applymanage.CountAndDateResponseDTO;
 import com.finalproject.recruit.entity.Apply;
@@ -161,5 +162,16 @@ public class ApplyManageService {
         }
 
         return response.success(result);
+    }
+
+    /**
+     * 지원자 상세조회
+     * @param applyId
+     * @return
+     */
+    public ResponseEntity<?> findApplicantDetail(Long applyId) {
+        ApplyDetailResponseDTO data = applyRepository.findJoinByApplyId(applyId).map(ApplyDetailResponseDTO::new).get();
+
+        return response.success(data);
     }
 }
