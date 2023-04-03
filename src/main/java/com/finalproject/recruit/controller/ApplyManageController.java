@@ -94,4 +94,14 @@ public class ApplyManageController {
 
         return applyManageService.dropApply(applyId);
     }
+
+    /**
+     * 지원자 면접날짜 지정
+     */
+    @PutMapping("/apply/set_meeting/{applyId}")
+    public ResponseEntity<?> setMeetDay(@PathVariable Long applyId,
+                                        @RequestParam(name = "meeting") String meeting) {
+
+        return applyManageService.setMeetDay(applyId, meeting);
+    }
 }

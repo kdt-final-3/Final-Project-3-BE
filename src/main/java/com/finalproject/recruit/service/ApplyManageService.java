@@ -234,4 +234,24 @@ public class ApplyManageService {
 
         return response.success("탈락인재 보관함 등록 / 해제 성공하였습니다.");
     }
+
+    /**
+     * 인재 면접날짜 지정
+     * @param applyId
+     * @param meeting
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> setMeetDay(Long applyId, String meeting) {
+        try {
+            LocalDateTime meetingDay = LocalDateTime.parse(meeting);
+
+            Apply findApply = applyRepository.findByApplyId(applyId).get();
+            findApply.setMeeting(meetingDay);
+        } catch (Exception e) {
+            return response.fail("면접일자 등록에 실패하였습니다.");
+        }
+
+        return response.success("면접일자 등록에 성공하였습니다.");
+    }
 }

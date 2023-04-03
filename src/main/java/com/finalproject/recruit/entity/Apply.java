@@ -242,4 +242,11 @@ public class Apply extends BaseTime {
         this.failApply = false;
     }
 
+    /**
+     * 면접일 지정
+     */
+    public void setMeeting(LocalDateTime meeting) {
+        this.meeting = meeting;
+    }
+
 }
