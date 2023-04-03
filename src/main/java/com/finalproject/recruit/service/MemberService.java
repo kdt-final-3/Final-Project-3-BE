@@ -168,4 +168,10 @@ public class MemberService {
         return response.success();
     }
     */
+
+    public Member loadMemberByMemberEmail(String memberEmail){
+        return memberRepo.findByMemberEmail(memberEmail).orElseThrow(
+                () -> new RuntimeException()
+        );
+    }
 }
