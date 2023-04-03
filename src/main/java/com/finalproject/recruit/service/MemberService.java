@@ -2,23 +2,15 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.member.MemberReqDTO;
-import com.finalproject.recruit.dto.member.MemberResDTO;
 import com.finalproject.recruit.entity.Member;
-import com.finalproject.recruit.jwt.JwtTokenProvider;
 import com.finalproject.recruit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +18,9 @@ public class MemberService {
 
     private final MemberRepository memberRepo;
 
-    private final JwtTokenProvider provider;
-
     private final Response response;
 
     private final RedisTemplate redisTemplate;
-
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final PasswordEncoder encoder;
 
@@ -61,7 +49,7 @@ public class MemberService {
 
     /**
      * 로그인
-     */
+
     public ResponseEntity<?> login(MemberReqDTO.Login login) {
 
         Member member = memberRepo.findByMemberEmail(login.getMemberEmail()).orElse(null);
@@ -79,9 +67,11 @@ public class MemberService {
                 .set("RT : " + login.getMemberEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         return response.success(tokenInfo, "로그인에 성공하셨습니다.", HttpStatus.OK);
     }
+     */
+
     /**
      * 로그아웃
-     */
+
     public ResponseEntity<?> logout(String accessToken) {
         System.out.println(accessToken);
 
@@ -98,13 +88,11 @@ public class MemberService {
                 .set(accessToken, "logout", expireTime, TimeUnit.MILLISECONDS);
 
         return response.success("로그아웃 되셨습니다.");
-
-
     }
+     */
 
     /**
      * 토큰 기한 연장
-     */
     public ResponseEntity<?> reissue(String accessToken, MemberReqDTO.Login login) {
         if (!provider.validateToken(accessToken)) {
             return response.fail("RefreshToken의 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
@@ -131,6 +119,7 @@ public class MemberService {
                 response.fail("이미 가입된 이메일입니다."):
         response.success("가입 가능한 이메일입니다.");
     }
+     */
 
     @Transactional
     public ResponseEntity<?> resetPassword(MemberReqDTO.ResetPassword password) {
@@ -152,7 +141,7 @@ public class MemberService {
 
     }
 
-
+    /*
     @Transactional
     public ResponseEntity<?> updateMemberInfo(String accessToken, MemberReqDTO.Edit edit) {
         Member member = memberRepo.findByMemberEmail(provider.getAuthentication(accessToken).getName()).orElse(null);
@@ -178,4 +167,5 @@ public class MemberService {
         }
         return response.success();
     }
+    */
 }
