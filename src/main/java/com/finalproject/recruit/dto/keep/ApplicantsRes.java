@@ -53,7 +53,6 @@ public class ApplicantsRes {
      public static List<Keywords> doSplit(String keywordsSelect){
           if (keywordsSelect != null) {
                final String[] split = keywordsSelect.split(",");
-               Arrays.stream(split).forEach(System.out::println);
                return Arrays.stream(split)
                        .map(Keywords::valueOf)
                        .collect(Collectors.toList());
