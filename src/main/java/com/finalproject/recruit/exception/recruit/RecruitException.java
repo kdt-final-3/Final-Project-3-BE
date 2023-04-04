@@ -10,6 +10,10 @@ public class RecruitException extends RuntimeException{
     private ErrorCode errorCode;
     private String message;
 
+    public RecruitException(ErrorCode err){
+        this.errorCode = err;
+    }
+
     @Override
     public String getMessage(){
         if(message == null)
