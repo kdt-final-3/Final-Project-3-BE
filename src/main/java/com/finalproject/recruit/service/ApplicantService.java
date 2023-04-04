@@ -5,10 +5,13 @@ import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.dto.applicant.ApplicationReq;
 import com.finalproject.recruit.dto.applicant.PreRequired;
+import com.finalproject.recruit.exception.recruit.ErrorCode;
+import com.finalproject.recruit.exception.recruit.RecruitException;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
 import com.finalproject.recruit.repository.apply.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ApplicantService {
-
     private final ApplyRepository applyRepository;
     private final RecruitRepository recruitRepository;
-
     private final ActivitiesRepository activitiesRepository;
     private final AwardsRepository awardsRepository;
     private final CareerRepository careerRepository;
@@ -29,14 +30,23 @@ public class ApplicantService {
 
     private final Response response;
 
+    /*===========================
+        지원서 등록
+    ===========================*/
     @Transactional
     public ResponseEntity<?> postApplication(ApplicationReq applicationReq) {
         try {
             if (!checkEmail(applicationReq.getApplyEmail(), applicationReq.getRecruitId())){
-                return response.fail("이미 현 채용공고에 지원하셨습니다.");
+                return response.fail(
+                        "Already apply current Applicant",
+                        HttpStatus.CONFLICT
+                );
             }
             Recruit recruit = recruitRepository.findByRecruitId(applicationReq.getRecruitId()).orElseThrow(
-                    () -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다.")
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Request %d RecruitFrom not found", applicationReq.getRecruitId())
+                    )
             );
 
             Apply apply = applyRepository.save(applicationReq.toApply(recruit));
@@ -49,25 +59,48 @@ public class ApplicantService {
             educationRepository.save(applicationReq.toEducation(apply));
             languageRepository.save(applicationReq.toLanguage(apply));
 
-            return response.success("지원서 제출에 성공했습니다.");
+            return response.success(
+                    apply,
+                    "Successfully Submit an Application",
+                    HttpStatus.OK
+            );
         } catch (Exception e) {
-            return response.fail("지원서 제출에 실패했습니다.");
+            e.printStackTrace();
+            return response.fail(
+                    "Unable to Submit an Application",
+                    HttpStatus.BAD_REQUEST
+            );
         }
-
-
     }
 
+    /*===========================
+        이메일 확인
+    ===========================*/
     public Boolean checkEmail(String email, Long recruitId) {
         return !applyRepository.existsApplyByApplyEmailAndRecruitRecruitId(email, recruitId);
     }
 
+    /*===========================
+        채용폼 정보추출
+    ===========================*/
     public ResponseEntity<?> preRequired(Long recruitId) {
-        Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElse(null);
-        if (recruit == null) {
-            return response.fail("채용공고가 존재하지 않습니다.");
+        try{
+            Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Request %d RecruitFrom not found", recruitId))
+            );
+            PreRequired preRequired = PreRequired.fromRecruit(recruit);
+            return response.success(
+                    preRequired,
+                    "Successfully Get RecruitForm Info",
+                    HttpStatus.OK
+            );
+        }catch (RecruitException e){
+            e.printStackTrace();
+            return response.fail(
+                    "Unable to Get RecruitForm Info",
+                    HttpStatus.BAD_REQUEST);
         }
-
-        PreRequired preRequired = PreRequired.fromRecruit(recruit);
-        return response.success(preRequired);
     }
 }

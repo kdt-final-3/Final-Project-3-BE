@@ -54,9 +54,7 @@ public class JwtManager {
     public Optional<AuthDTO> getMemberInfoOf(String header){
         // Header 검증
         if (!headerValidation(header)) {
-            throw new AuthException(
-                    ErrorCode.INVALID_HEADER
-            );
+            throw new AuthException(ErrorCode.INVALID_HEADER);
         }
         try {
             // 토큰 추출
@@ -114,14 +112,17 @@ public class JwtManager {
             return false;
         } catch (SecurityException | MalformedJwtException err) {
             log.error("Invalid JWT Token", err);
+            throw new AuthException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException err) {
             log.error("Expired JWT Token", err);
+            throw new AuthException(ErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException err) {
             log.error("Unsupported JWT Token", err);
+            throw new AuthException(ErrorCode.INVALID_TOKEN);
         } catch (IllegalArgumentException err) {
             log.error("JWT claims string is empty", err);
+            throw new AuthException(ErrorCode.EMPTY_CLAMIS);
         }
-        return false;
     }
 
     // 토큰 발급자 확인

@@ -46,6 +46,9 @@ public class Response<T> {
     public ResponseEntity<?> success(Object data) {
         return success(data, null, HttpStatus.OK);
     }
+    public ResponseEntity<?> success(Object data, String msg) {
+        return success(data, msg, HttpStatus.OK);
+    }
 
     // Return Type : state
     public ResponseEntity<?> success() {
@@ -76,6 +79,7 @@ public class Response<T> {
     public ResponseEntity<?> fail(String msg) {
         return fail(null, msg, HttpStatus.BAD_REQUEST);
     }
+
 
     /*===========================
        Archive

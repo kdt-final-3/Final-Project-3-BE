@@ -1,16 +1,14 @@
-package com.finalproject.recruit.exception.authorization;
+package com.finalproject.recruit.exception.notice;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AuthException extends RuntimeException{
-
+public class NoticeException extends RuntimeException{
     private ErrorCode errorCode;
     private String message;
-
-    public AuthException(ErrorCode err) {
+    public NoticeException(ErrorCode err) {
         this.errorCode = err;
     }
 

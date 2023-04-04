@@ -207,9 +207,6 @@ public class MemberService {
         return encoder.matches(input, origin);
     }
 
-
-
-
     /**
      * 인증번호 발송
      */
@@ -260,5 +257,14 @@ public class MemberService {
         else {
             return response.fail("잘못된 인증 번호입니다.");
         }
+    }
+
+    /**
+     * 회원정보 추출
+     */
+    public Member loadMemberByMemberEmail(String memberEmail){
+        return memberRepo.findByMemberEmail(memberEmail).orElseThrow(
+                () -> new RuntimeException()
+        );
     }
 }
