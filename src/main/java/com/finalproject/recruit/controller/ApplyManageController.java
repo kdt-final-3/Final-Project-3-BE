@@ -100,9 +100,10 @@ public class ApplyManageController {
      */
     @PutMapping("/apply/set_meeting/{applyId}")
     public ResponseEntity<?> setMeetDay(@PathVariable Long applyId,
-                                        @RequestParam(name = "meeting") String meeting) {
+                                        @RequestParam(name = "interviewDate") String interviewDate,
+                                        @RequestParam(name = "interviewTime") String interviewTime) {
 
-        return applyManageService.setMeetDay(applyId, meeting);
+        return applyManageService.setMeetDay(applyId, interviewDate, interviewTime);
     }
 
     /**
