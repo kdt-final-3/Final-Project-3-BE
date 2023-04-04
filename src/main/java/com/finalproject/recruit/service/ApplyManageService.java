@@ -267,12 +267,14 @@ public class ApplyManageService {
     /**
      * 인재 면접날짜 지정
      * @param applyId
-     * @param meeting
+     * @param interviewDate
+     * @param interviewTime
      * @return
      */
     @Transactional
-    public ResponseEntity<?> setMeetDay(Long applyId, String meeting) {
+    public ResponseEntity<?> setMeetDay(Long applyId, String interviewDate, String interviewTime) {
         try {
+            String meeting = interviewDate + "T" + interviewTime;
             LocalDateTime meetingDay = LocalDateTime.parse(meeting);
 
             Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
