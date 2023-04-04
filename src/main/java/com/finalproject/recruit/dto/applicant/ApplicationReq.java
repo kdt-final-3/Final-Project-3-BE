@@ -31,7 +31,7 @@ public class ApplicationReq {
 
         private String applyResume;
 
-        private List<Boolean> keywordsReq;
+        private String keywordsReq;
 
         /**
          * 우대사항 관련
@@ -73,12 +73,6 @@ public class ApplicationReq {
         private String languageSkill;
         private LanguageLevel languageLevel;
 
-        private LocalDateTime militaryStart;
-        private LocalDateTime militaryEnd;
-        private MilitaryDivision militaryDivision;
-        private MilitaryCategory militaryCategory;
-        private MilitaryClass militaryClass;
-        private String militaryExemption;
 
 
         public Apply toApply(Recruit recruit){
@@ -90,7 +84,7 @@ public class ApplicationReq {
                         .resumeContent(resumeContent)
                         .applyPortfolio(applyPortfolio)
                         .applyResume(applyResume)
-                        .keywordSelect(keywordToString(keywordsReq))
+                        .keywordSelect(keywordsReq)
                         .disorder(disorder)
                         .veteran(veteran)
                         .employment(employment)
@@ -161,8 +155,6 @@ public class ApplicationReq {
         }
 
         public Language toLanguage(Apply apply){
-                System.out.println("이거는?");
-                System.out.println(languageLevel);
                 return Language.builder()
                         .apply(apply)
                         .languageName(languageName)
@@ -171,16 +163,5 @@ public class ApplicationReq {
                         .build();
         }
 
-        public Military toMilitary(Apply apply){
-                return Military.builder()
-                        .apply(apply)
-                        .militaryStart(militaryStart)
-                        .militaryEnd(militaryEnd)
-                        .militaryDivision(militaryDivision)
-                        .militaryCategory(militaryCategory)
-                        .militaryClass(militaryClass)
-                        .militaryExemption(militaryExemption)
-                        .build();
-        }
 
 }

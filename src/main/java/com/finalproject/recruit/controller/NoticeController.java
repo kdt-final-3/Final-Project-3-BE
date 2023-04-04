@@ -4,6 +4,7 @@ import com.finalproject.recruit.dto.notice.EmailReq;
 import com.finalproject.recruit.dto.notice.SelectStepReq;
 import com.finalproject.recruit.service.NoticeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +28,8 @@ public class NoticeController {
      * 특정 채용폼의 지원자 목록 조회
      * */
     @GetMapping("/{recruitId}")
-    public ResponseEntity<?> applicantList(@PathVariable Long recruitId){
-        return noticeService.applicantList(recruitId);
+    public ResponseEntity<?> applicantList(@PathVariable Long recruitId, Pageable pageable){
+        return noticeService.applicantList(recruitId, pageable);
     }
 
 

@@ -16,7 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,9 +36,35 @@ public class ApplyManageService {
      * @return
      */
     public ResponseEntity<?> findAllApplicants(Long recruitId) {
+        Recruit findRecruit = recruitRepository.findByRecruitId(recruitId).get();
+        StringTokenizer st = new StringTokenizer(findRecruit.getKeywordStandard(), ","); //채용폼 키워드 분리
+
+        HashSet<String> keywordStandard = new HashSet<>();
+
+        while (st.hasMoreTokens()) { //HashSet에 기준 키워드 저장 (기업 측이 선정한)
+            keywordStandard.add(st.nextToken());
+        }
+
         List<ApplyResponseDTO> data = applyRepository.findByRecruitRecruitId(recruitId)
                 .stream().map(ApplyResponseDTO::new)
                 .collect(Collectors.toList());
+
+        for (ApplyResponseDTO dto : data) {
+            int score = 0;
+            List<String> applyKeywords = new ArrayList<>();
+            st = new StringTokenizer(dto.getKeywords(), ",");
+
+            while (st.hasMoreTokens()) {
+                String keyword = st.nextToken();
+                applyKeywords.add(keyword); //키워드를 배열로 저장해서 반환
+                if (keywordStandard.contains(keyword)) { //기준 키워드와 동일 시 가점 추가
+                    score++;
+                }
+            }
+
+            dto.setScore(score); //가점 반환
+            dto.setKeywordList(applyKeywords); //키워드 배열 반환
+        }
 
         return response.success(data);
     }

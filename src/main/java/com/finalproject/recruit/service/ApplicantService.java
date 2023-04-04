@@ -26,7 +26,6 @@ public class ApplicantService {
     private final CertificateRepository certificateRepository;
     private final EducationRepository educationRepository;
     private final LanguageRepository languageRepository;
-    private final MilitaryRepository militaryRepository;
 
     private final Response response;
 
@@ -39,15 +38,17 @@ public class ApplicantService {
             Recruit recruit = recruitRepository.findByRecruitId(applicationReq.getRecruitId()).orElseThrow(
                     () -> new IllegalArgumentException("해당 채용공고가 존재하지 않습니다.")
             );
+
             Apply apply = applyRepository.save(applicationReq.toApply(recruit));
-            //Apply apply = applyRepository.findByApplyId(applicationReq.getApplyId()).orElseThrow(()-> new IllegalArgumentException("지원자가 존재하지 않습니다."));
+            apply.setPaperSubmit();
+
             activitiesRepository.save(applicationReq.toActivities(apply));
             awardsRepository.save(applicationReq.toAwards(apply));
             careerRepository.save(applicationReq.toCareer(apply));
             certificateRepository.save(applicationReq.toCertificate(apply));
             educationRepository.save(applicationReq.toEducation(apply));
             languageRepository.save(applicationReq.toLanguage(apply));
-            militaryRepository.save(applicationReq.toMilitary(apply));
+
             return response.success("지원서 제출에 성공했습니다.");
         } catch (Exception e) {
             return response.fail("지원서 제출에 실패했습니다.");
