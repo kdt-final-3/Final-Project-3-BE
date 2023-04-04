@@ -5,8 +5,8 @@ import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.dto.applicant.ApplicationReq;
 import com.finalproject.recruit.dto.applicant.PreRequired;
-import com.finalproject.recruit.exception.recruit.ErrorCode;
-import com.finalproject.recruit.exception.recruit.RecruitException;
+import com.finalproject.recruit.exception.applicant.ApplicantException;
+import com.finalproject.recruit.exception.applicant.ErrorCode;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
 import com.finalproject.recruit.repository.apply.*;
@@ -38,15 +38,11 @@ public class ApplicantService {
         try {
             if (!checkEmail(applicationReq.getApplyEmail(), applicationReq.getRecruitId())){
                 return response.fail(
-                        "Already apply current Applicant",
-                        HttpStatus.CONFLICT
-                );
+                        ErrorCode.EMAIL_NOT_FOUND.getMessage(),
+                        ErrorCode.EMAIL_NOT_FOUND.getStatus());
             }
             Recruit recruit = recruitRepository.findByRecruitId(applicationReq.getRecruitId()).orElseThrow(
-                    () -> new RecruitException(
-                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
-                            String.format("Request %d RecruitFrom not found", applicationReq.getRecruitId())
-                    )
+                    () -> new ApplicantException(ErrorCode.RECRUIT_FORM_NOT_FOUND)
             );
 
             Apply apply = applyRepository.save(applicationReq.toApply(recruit));
@@ -61,15 +57,10 @@ public class ApplicantService {
 
             return response.success(
                     apply,
-                    "Successfully Submit an Application",
-                    HttpStatus.OK
-            );
+                    "Successfully Submit an Application");
         } catch (Exception e) {
             e.printStackTrace();
-            return response.fail(
-                    "Unable to Submit an Application",
-                    HttpStatus.BAD_REQUEST
-            );
+            throw new ApplicantException(ErrorCode.FAIL_TO_SUBMIT_APPLICANT);
         }
     }
 
@@ -86,21 +77,17 @@ public class ApplicantService {
     public ResponseEntity<?> preRequired(Long recruitId) {
         try{
             Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
-                    () -> new RecruitException(
+                    () -> new ApplicantException(
                             ErrorCode.RECRUIT_FORM_NOT_FOUND,
-                            String.format("Request %d RecruitFrom not found", recruitId))
+                            String.format("Request RecruitFrom %d Not Found", recruitId))
             );
             PreRequired preRequired = PreRequired.fromRecruit(recruit);
             return response.success(
                     preRequired,
-                    "Successfully Get RecruitForm Info",
-                    HttpStatus.OK
-            );
-        }catch (RecruitException e){
+                    "Successfully Get RecruitForm Info");
+        }catch (ApplicantException e) {
             e.printStackTrace();
-            return response.fail(
-                    "Unable to Get RecruitForm Info",
-                    HttpStatus.BAD_REQUEST);
+            throw new ApplicantException(ErrorCode.UNABLE_TO_PROCESS_REQUEST);
         }
     }
 }

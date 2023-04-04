@@ -153,11 +153,9 @@ public class NoticeService {
 
             return response.success("Successfully Sending Email");
 
-        } catch (NoticeException e){
+        } catch (NoticeException e) {
             e.printStackTrace();
-            return response.fail(
-                    ErrorCode.UNABLE_TO_SEND_MESSAGE.getMessage(),
-                    ErrorCode.UNABLE_TO_SEND_MESSAGE.getStatus());
+            throw new NoticeException(ErrorCode.UNABLE_TO_SEND_MESSAGE);
         }
     }
 

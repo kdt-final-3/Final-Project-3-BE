@@ -4,6 +4,8 @@ import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.member.MemberReqDTO;
 import com.finalproject.recruit.dto.member.MemberResDTO;
 import com.finalproject.recruit.entity.Member;
+import com.finalproject.recruit.exception.recruit.ErrorCode;
+import com.finalproject.recruit.exception.recruit.RecruitException;
 import com.finalproject.recruit.jwt.JwtManager;
 import com.finalproject.recruit.jwt.JwtProperties;
 import com.finalproject.recruit.repository.MailRepository;
@@ -264,7 +266,7 @@ public class MemberService {
      */
     public Member loadMemberByMemberEmail(String memberEmail){
         return memberRepo.findByMemberEmail(memberEmail).orElseThrow(
-                () -> new RuntimeException()
+                () -> new RecruitException(ErrorCode.MEMBER_NOT_FOUND)
         );
     }
 }
