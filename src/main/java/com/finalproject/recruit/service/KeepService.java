@@ -5,8 +5,8 @@ import com.finalproject.recruit.dto.keep.ApplicantsRes;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Mail;
 import com.finalproject.recruit.entity.Recruit;
-import com.finalproject.recruit.exception.recruit.ErrorCode;
-import com.finalproject.recruit.exception.recruit.RecruitException;
+import com.finalproject.recruit.exception.keep.ErrorCode;
+import com.finalproject.recruit.exception.keep.KeepException;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.MailRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,65 +33,92 @@ public class KeepService {
     public ResponseEntity<?> recentRecruit(String email, Pageable pageable) {
         try{
             Recruit recentRecruit = recruitRepository.findTopByAndMemberMemberEmailOrderByRecruitRegistedAt(email).orElseThrow(
-                    () -> new RecruitException(ErrorCode.RECRUIT_FORM_NOT_FOUND));
+                    () -> new KeepException(ErrorCode.RECRUIT_FORM_NOT_FOUND));
             return dropApplicants(recentRecruit.getRecruitId(), pageable);
 
-        }catch(RecruitException e){
+        }catch(KeepException e) {
             e.printStackTrace();
-            return response.fail(
-                    "Unable to Process Your Request",
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new KeepException(ErrorCode.UNABLE_TO_PROCESS_REQUEST);
         }
     }
 
     /*===========================
         탈락 인재보관
     ===========================*/
+    @Transactional
     public ResponseEntity<?> dropApplicants(Long recruitId, Pageable pageable){
-        Page<Apply> nonPassApplicants = applyRepository.findByRecruitRecruitIdAndFailApplyIsTrue(recruitId,pageable);
+        try{
+            Page<Apply> nonPassApplicants = applyRepository.findByRecruitRecruitIdAndFailApplyIsTrue(recruitId,pageable);
+            // empty check
+            if(!hasContents(nonPassApplicants)){
+                return response.fail(
+                        ErrorCode.APPLY_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLY_NOT_FOUND.getStatus());
+            }
 
-        if(hasApplicants(nonPassApplicants)){
             Page<ApplicantsRes> applicantsResList = nonPassApplicants
                     .map(apply -> ApplicantsRes.fromApply(
                             apply,
                             mailRepository.findTopByApplyApplyIdOrderByCreatedTimeDesc(apply.getApplyId())
                                     .map(Mail::getCreatedTime)
-                                    .orElse(null)));    // 최근 메세지 연락이 없으면 Null을 넣는 로직으로 보여 Exception 추가X
-            return response.success(applicantsResList);
+                                    .orElse(null)));
+            // empty check()
+            if(!hasContents(applicantsResList)){
+                return response.fail(
+                        ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
+            }
+
+            return response.success(
+                    applicantsResList,
+                    "Successfully Get Drop Applicants List"
+            );
+
+        }catch(KeepException e){
+            e.printStackTrace();
+            throw new KeepException(ErrorCode.UNABLE_TO_PROCESS_REQUEST);
         }
-        return response.fail(
-                "NonPassApplicants Not Found",
-                HttpStatus.NOT_FOUND
-        );
     }
 
     /*===========================
         영구삭제 인재보관
     ===========================*/
     public ResponseEntity<?> eternalDeleteApplicants(Long recruitId, Pageable pageable) {
-        Page<Apply> deletedApplicants = applyRepository.findByRecruitRecruitIdAndApplyDeleteIsTrue(recruitId, pageable);
+        try{
+            Page<Apply> deletedApplicants = applyRepository.findByRecruitRecruitIdAndApplyDeleteIsTrue(recruitId, pageable);
+            // empty check
+            if(!hasContents(deletedApplicants)){
+                return response.fail(
+                        ErrorCode.APPLY_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLY_NOT_FOUND.getStatus());
+            }
 
-        if(hasApplicants(deletedApplicants)){
             Page<ApplicantsRes> applicantsResList = deletedApplicants
                     .map(apply -> ApplicantsRes.fromApply(
                             apply,
                             mailRepository.findTopByApplyApplyIdOrderByCreatedTimeDesc(apply.getApplyId())
                                     .map(Mail::getCreatedTime)
-                                    .orElse(null)));    // 최근 메세지 연락이 없으면 Null을 넣는 로직으로 보여 Exception 추가X
-            return response.success(applicantsResList);
-        }
-        return response.fail(
-                "EternalDeleteApplicants Not Found",
-                HttpStatus.NOT_FOUND
-        );
+                                    .orElse(null)));
+            // empty check()
+            if(!hasContents(applicantsResList)){
+                return response.fail(
+                        ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
+            }
 
+            return response.success(
+                    applicantsResList,
+                    "Successfully Get Deleted Applicants List");
+        }catch(KeepException e){
+            e.printStackTrace();
+            throw new KeepException(ErrorCode.UNABLE_TO_PROCESS_REQUEST);
+        }
     }
 
     /*===========================
         Empty Check
     ===========================*/
-    public boolean hasApplicants(Page<Apply> input){
+    public boolean hasContents(Page<?> input){
         return input.hasContent();
     }
 }
