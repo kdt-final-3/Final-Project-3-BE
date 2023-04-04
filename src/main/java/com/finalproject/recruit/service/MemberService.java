@@ -4,8 +4,8 @@ import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.member.MemberReqDTO;
 import com.finalproject.recruit.dto.member.MemberResDTO;
 import com.finalproject.recruit.entity.Member;
-import com.finalproject.recruit.exception.recruit.ErrorCode;
-import com.finalproject.recruit.exception.recruit.RecruitException;
+import com.finalproject.recruit.exception.member.ErrorCode;
+import com.finalproject.recruit.exception.member.MemberException;
 import com.finalproject.recruit.jwt.JwtManager;
 import com.finalproject.recruit.jwt.JwtProperties;
 import com.finalproject.recruit.repository.MailRepository;
@@ -43,230 +43,446 @@ public class MemberService {
 
     private final JavaMailSender mailSender;
 
+    private static final Long TIME_OUT = 3 * 60 * 1800L;
 
-    private static final String pattern = "^[A-Za-z[0-9]]{8,16}$"; // 영문, 숫자 8~16자리
-
-    /**
-     * 회원가입
-     */
+    /*===========================
+        회원가입
+     ===========================*/
     public ResponseEntity<?> signUp(MemberReqDTO.SignUp signUp) {
-        if (memberRepo.existsByMemberEmail(signUp.getMemberEmail())) {
-            return response.fail("이미 가입된 이메일입니다.", HttpStatus.BAD_REQUEST);
-        }
+        try{
+            // 이메일 중복검증
+            if (memberRepo.existsByMemberEmail(signUp.getMemberEmail())) {
+                return response.fail(
+                        String.format("%s : %s", ErrorCode.ALREADY_EXIST.getMessage(), signUp.getMemberEmail()),
+                        ErrorCode.ALREADY_EXIST.getStatus());
+            }
 
-        Member member = Member.builder()
-                .memberEmail(signUp.getMemberEmail())
-                .password(encoder.encode(signUp.getPassword()))
-                .memberPhone(signUp.getMemberPhone())
-                .ceoName(signUp.getCeoName())
-                .companyName(signUp.getCompanyName())
-                .companyNum(signUp.getCompanyNum())
-                .memberDelete(false)
-                .build();
-        memberRepo.save(member);
-        return response.success("회원가입에 성공하였습니다.");
+            // 등록할 회원객체 생성
+            Member member = Member.builder()
+                    .memberEmail(signUp.getMemberEmail())
+                    .password(encoder.encode(signUp.getPassword()))
+                    .memberPhone(signUp.getMemberPhone())
+                    .ceoName(signUp.getCeoName())
+                    .companyName(signUp.getCompanyName())
+                    .companyNum(signUp.getCompanyNum())
+                    .memberDelete(false)
+                    .build();
+
+            memberRepo.save(member);
+            return response.success("Successfully SignUp");
+
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.SIGNUP_FAILED);
+        }
     }
 
-    /**
-     * 로그인
-     **/
+    /*===========================
+        로그인
+     ===========================*/
     public ResponseEntity<?> login(MemberReqDTO.Login login) {
+        try{
+            // 이메일 검증
+            Member member = memberRepo.findByMemberEmail(login.getMemberEmail())
+                    .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
+            // 비밀번호 검증
+            if (!checkPassword(login.getPassword(), member.getPassword())) {
+                return response.fail(
+                        ErrorCode.INCORRECT_PASSWORD.getMessage(),
+                        ErrorCode.INCORRECT_PASSWORD.getStatus());
+            }
 
-        Member member = memberRepo
-                .findByMemberEmail(login.getMemberEmail())
-                .orElseThrow(() -> new RuntimeException());
-        if (member == null) {
-            return response.fail("이메일을 확인해주세요.");
+            // 로그인 객체생성
+            MemberResDTO.TokenInfo loginInfo = new MemberResDTO.TokenInfo(
+                    manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
+                    manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
+                    properties.getRefreshTokenExpiredTime()
+            );
+
+            // Redis 저장
+            registToRedis(loginInfo, member.getMemberEmail());
+
+            // 결과전달
+            return response.success(
+                    loginInfo,
+                    "Successfully Login");
+
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.LOGIN_FAILED);
         }
-        if (!checkPassword(login.getPassword(), member.getPassword())) {
-            return response.fail("비밀번호를 확인해주세요.");
-        }
-
-        MemberResDTO.TokenInfo tokenInfo = new MemberResDTO.TokenInfo(
-                manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
-                manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
-                properties.getRefreshTokenExpiredTime()
-        );
-
-        redisTemplate.opsForValue()
-                .set("RT : " + login.getMemberEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        return response.success(tokenInfo, "로그인에 성공하셨습니다.", HttpStatus.OK);
     }
 
-
-    /**
-     * 로그아웃
-     **/
+    /*===========================
+        로그아웃
+     ===========================*/
     public ResponseEntity<?> logout(String memberEmail, String accessToken) {
-        if (redisTemplate.opsForValue().get("RT : " + memberEmail) != null) {
-            redisTemplate.delete("RT : " + memberEmail);
+        try{
+            Long expireTime = manager.getExpiredTime(accessToken);
+            deleteFromRedis(memberEmail, accessToken, expireTime);
+
+            return response.success("Successfully Logout");
+
+        }catch (MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.LOGOUT_FAILED);
         }
-
-        Long expireTime = manager.getExpiredTime(accessToken);
-
-        redisTemplate.opsForValue()
-                .set(accessToken, "logout", expireTime, TimeUnit.MILLISECONDS);
-
-        return response.success("로그아웃 되셨습니다.");
     }
 
-
-    /**
-     * 토큰 기한 연장
-     **/
+    /*===========================
+        토큰 유효기간 연장
+     ===========================*/
     public ResponseEntity<?> reissue(String accessToken, String memberEmail) {
-        if (!manager.isValid(accessToken)) {
-            return response.fail("RefreshToken의 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+        try {
+            // 토큰검증
+            if (!manager.isValid(accessToken)) {
+                return response.fail(
+                        ErrorCode.INVALID_TOKEN.getMessage(),
+                        ErrorCode.INVALID_TOKEN.getStatus());
+            }
+            // 회원객체 검증
+            Member member = memberRepo.findByMemberEmail(memberEmail).orElseThrow(
+                    () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+            // Redis로 부터 refreshToken 추출
+            String refreshToken = loadAuthFromRedis(memberEmail);
+
+            // 토큰 신규발급
+            MemberResDTO.TokenInfo memberInfo = new MemberResDTO.TokenInfo(
+                    manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
+                    manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
+                    properties.getRefreshTokenExpiredTime()
+            );
+
+            // 토큰정보 갱신
+            registToRedis(memberInfo, memberEmail);
+
+            return response.success(
+                    memberInfo,
+                    "Successfully Extend Token ExpiredTime");
+        } catch (MemberException e) {
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.EXTEND_TOKEN_TIME_FAILED);
         }
-
-        String refreshToken = (String)redisTemplate.opsForValue().get("RT : " + memberEmail);
-
-        if (ObjectUtils.isEmpty(refreshToken)) {
-            return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
-        }
-        Member member = memberRepo
-                .findByMemberEmail(memberEmail)
-                .orElseThrow(() -> new RuntimeException());
-
-        MemberResDTO.TokenInfo tokenInfo = new MemberResDTO.TokenInfo(
-                manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
-                manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
-                properties.getRefreshTokenExpiredTime()
-        );
-
-        redisTemplate.opsForValue()
-                .set("RT : " + memberEmail,
-                        tokenInfo.getRefreshToken(),
-                        tokenInfo.getRefreshTokenExpirationTime(),
-                        TimeUnit.MILLISECONDS);
-
-        return response.success(tokenInfo, "갱신하였습니다.", HttpStatus.OK);
     }
 
+    /*===========================
+        이메일 중복확인
+     ===========================*/
     public ResponseEntity<?> existEmail(String email) {
         return memberRepo.existsByMemberEmail(email)?
-                response.fail("이미 가입된 이메일입니다."):
-                response.success("가입 가능한 이메일입니다.");
+                response.fail(
+                        ErrorCode.ALREADY_EXIST.getMessage(),
+                        ErrorCode.ALREADY_EXIST.getStatus()):
+                response.success("Available Email For Signup");
     }
 
-
+    /*===========================
+        비밀번호 관련
+     ===========================*/
+    // 비밀번호 재설정
     @Transactional
     public ResponseEntity<?> resetPassword(MemberReqDTO.ResetPassword password) {
-        System.out.println(password.getNewPassword());
-        if (!password.getNewPassword().equals(password.getPasswordCheck())) {
-            return response.fail("일치하지 않습니다");
-        }
-        Member member = memberRepo.findByMemberEmail(password.getMemberEmail()).orElse(null);
+        try{
+            // 신규 비밀번호 일치확인
+            if (!password.getNewPassword().equals(password.getPasswordCheck())) {
+                return response.fail(
+                        ErrorCode.MISMATCH_PASSWORD.getMessage(),
+                        ErrorCode.MISMATCH_PASSWORD.getStatus());
+            }
 
-        try {
-            member.resetPassword(encoder.encode(password.getNewPassword()));
-            System.out.println(member.getPassword());
-        }
-        catch (Exception e) {
+            // 멤버정보 확인
+            Member member = memberRepo.findByMemberEmail(password.getMemberEmail()).orElseThrow(
+                    () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+            // 비밀번호 변경 및 검증
+            resetPasswordValidation(member, password.getNewPassword(), password.getMemberEmail());
+
+            return response.success("Successfully Update Password");
+        }catch (Exception e) {
             e.printStackTrace();
-            return response.fail("실패");
+            return response.fail(
+                    ErrorCode.UNABLE_TO_PROCESS_REQUEST.getMessage(),
+                    ErrorCode.UNABLE_TO_PROCESS_REQUEST.getStatus());
         }
-        return response.success();
 
     }
 
-    /**
-     * 기업정보변경
-     **/
+    // 비밀번호 변경 & 검증
     @Transactional
-    public ResponseEntity<?> updateMemberInfo(String memberEmail, MemberReqDTO.Edit edit) {
-        System.out.println(memberEmail);
-        Member member = memberRepo
-                .findByMemberEmail(memberEmail)
-                .orElseThrow(() -> new RuntimeException());
+    public void resetPasswordValidation(Member member, String password, String email){
+        try{
+            member.resetPassword(encoder.encode(password));
+            Member updateMember = memberRepo.save(member);
 
-        try {
-            edit.setPassword(encoder.encode(edit.getPassword()));
-            member.updateMemberInfo(edit);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return response.fail("실패");
-        }
+            // 비밀번호 업데이트 검증
+            if(!checkPassword(member.getPassword(), updateMember.getPassword())){
+                throw new MemberException(ErrorCode.PASSWORD_UPDATE_FAILED);
+            }
 
-        return response.success();
-    }
-    @Transactional
-    public ResponseEntity<?> dropMember(String memberEmail) {
-        Member member = memberRepo.findByMemberEmail(memberEmail).orElse(null);
-        try {
-            member.dropMember();
-        }
-        catch (Exception e) {
+        }catch (MemberException e){
             e.printStackTrace();
-            return response.fail("실패");
+            throw new MemberException(ErrorCode.PASSWORD_UPDATE_FAILED);
         }
-        return response.success();
     }
 
+    // 비밀번호 확인
     private boolean checkPassword(String input, String origin) {
         return encoder.matches(input, origin);
     }
 
-    /**
-     * 인증번호 발송
-     */
-    public ResponseEntity<?> sendAuthNumber(String memberEmail) {
-        Random random = new Random();
-        int createNum = 0;
-        String ranNum = "";
-        int letter = 6;
-        String resultNum = "";
-        for (int i = 0; i < letter; i++) {
-            createNum = random.nextInt(9);
-            ranNum = Integer.toString(createNum);
-            resultNum += ranNum;
-        }
-        try {
-            SimpleMailMessage authNum = new SimpleMailMessage();
-            authNum.setSubject(memberEmail + " 인증 번호입니다.");
-            authNum.setTo(memberEmail);
-            authNum.setText(resultNum);
-            System.out.println(authNum.toString());
-            mailSender.send(authNum);
-            redisTemplate.opsForValue()
-                    .set("Auth : " + memberEmail, resultNum, 3 * 60 * 1800L, TimeUnit.MILLISECONDS);
-        }
-        catch (Exception e) {
+    /*===========================
+        멤버정보 변경
+     ===========================*/
+    @Transactional
+    public ResponseEntity<?> updateMemberInfo(String memberEmail, MemberReqDTO.Edit edit) {
+        try{
+            Member member = memberRepo.findByMemberEmail(memberEmail).orElseThrow(
+                    () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+            // 비밀번호 변경 희망시
+            if (edit.getPassword() != null) {
+                member.resetPassword(encoder.encode(edit.getPassword()));
+            }
+
+            // 회원정보 변경
+            member.updateMemberInfo(edit);
+            Member updateMember = memberRepo.save(member);
+
+            // 변경정보 검증
+            if(!updateMember.equals(member)){
+                return response.fail(
+                        ErrorCode.INFO_UPDATE_FAILED.getMessage(),
+                        ErrorCode.INFO_UPDATE_FAILED.getStatus());
+            }
+            return response.success("Successfully Update MemberInfo");
+        }catch (MemberException e){
             e.printStackTrace();
-            return response.fail("다시 시도하여 주십시오.");
+            throw new MemberException(ErrorCode.INFO_UPDATE_FAILED);
         }
-        return response.success();
     }
 
-    /**
-     * 인증번호 인증
-     */
+    /*===========================
+        멤버삭제 (soft)
+    ===========================*/
+    @Transactional
+    public ResponseEntity<?> dropMember(String memberEmail) {
+        try{
+            Member member = memberRepo.findByMemberEmail(memberEmail).orElseThrow(
+                    () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+            // 멤버삭제
+            member.dropMember();
+            Member deleteMember = memberRepo.save(member);
+
+            if(!deleteMember.isMemberDelete()){
+                return response.fail(
+                        ErrorCode.MEMBER_DELETE_FAILED.getMessage(),
+                        ErrorCode.MEMBER_DELETE_FAILED.getStatus());
+            }
+            return response.success("Successfully Delete MemberInfo");
+        } catch (MemberException e) {
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.MEMBER_DELETE_FAILED);
+        }
+    }
+
+    /*===========================
+        인증번호 전송
+    ===========================*/
+    public ResponseEntity<?> sendAuthNumber(String memberEmail) {
+        try {
+            // 인증번호 생성
+            String resultNum = generateNumber();
+            if(resultNum == null){
+                return response.fail(
+                        ErrorCode.NUMBER_GENERATE_FAILED.getMessage(),
+                        ErrorCode.NUMBER_GENERATE_FAILED.getStatus());
+            }
+
+            // 메일전송
+            mailSend(memberEmail, resultNum);
+
+            // Redis 등록
+            registToRedis(memberEmail, resultNum);
+
+
+            return response.success("Successfully Send Authorization Info");
+        }
+        catch (MemberException e) {
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.UNABLE_TO_PROCESS_REQUEST);
+        }
+    }
+
+    // 난수생성
+    public String generateNumber(){
+        Random rand = new Random();
+        int number = rand.nextInt(900000) + 100000;
+        return String.valueOf(number);
+    }
+
+    // 메세지 전송
+    public void mailSend(String email, String number){
+        // 전송객체 생성
+        SimpleMailMessage authNum = new SimpleMailMessage();
+        authNum.setSubject(email + " 인증 번호입니다.");
+        authNum.setTo(email);
+        authNum.setText(number);
+
+        try{
+            mailSender.send(authNum);
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.UNABLE_TO_SEND_MESSAGE);
+        }
+    }
+
+    /*===========================
+        번호인증
+    ===========================*/
     public ResponseEntity<?> numberAuth(MemberReqDTO.AuthMail authMail) {
-        String memberEmail = authMail.getMemberEmail();
-        String authNum = authMail.getAuthNumber();
-        if (redisTemplate.opsForValue().get("Auth : " + memberEmail) == null) {
-            return response.fail("만료되었습니다. 다시 인증을 시도하여 주십시오.");
-        }
+        try{
+            String memberEmail = authMail.getMemberEmail();
+            String authNum = authMail.getAuthNumber();
 
-        String correctAuth = redisTemplate.opsForValue().get("Auth : " + memberEmail).toString();
-        if (correctAuth.equals(authNum)) {
+            // Redis 정보추출
+            String extractNum = loadNumFromRedis(memberEmail);
 
-            redisTemplate.delete("Auth : " + memberEmail);
+            // 인증번호 검증
+            if (!extractNum.equals(authNum)) {
+                return response.fail(
+                        ErrorCode.INCORRECT_AUTH_NUM.getMessage(),
+                        ErrorCode.INCORRECT_AUTH_NUM.getStatus());
+            }
+
+            // 검증완료
+            deleteFromRedis(memberEmail);
             return response.success();
-        }
-        else {
-            return response.fail("잘못된 인증 번호입니다.");
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.AUTH_NUM_VALIDATION_FAILED);
         }
     }
 
-    /**
-     * 회원정보 추출
-     */
+    /*===========================
+        회원정보 추출
+    ===========================*/
     public Member loadMemberByMemberEmail(String memberEmail){
         return memberRepo.findByMemberEmail(memberEmail).orElseThrow(
-                () -> new RecruitException(ErrorCode.MEMBER_NOT_FOUND)
+                () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND)
         );
+    }
+    /*===========================
+        Redis
+     ===========================*/
+    // Token 정보등록
+    public void registToRedis(MemberResDTO.TokenInfo input, String email){
+        try{
+            // Redis 등록
+            redisTemplate.opsForValue()
+                    .set("RT : " + email,
+                            input.getRefreshToken(),
+                            input.getRefreshTokenExpirationTime(),
+                            TimeUnit.MILLISECONDS
+                    );
+
+            // 등록값 검증
+            if(redisTemplate.opsForValue().get("RT : " + email) == null){
+                throw new MemberException(ErrorCode.REDIS_VERIFIED_FALID);
+            }
+
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_REGIST_FAILED);
+        }
+    }
+
+    // 인증번호 정보등록
+    public void registToRedis(String email, String resultNum){
+        try{
+            // Redis 등록
+            redisTemplate.opsForValue()
+                    .set("Auth : " + email,
+                            resultNum,
+                            TIME_OUT,
+                            TimeUnit.MILLISECONDS
+                    );
+
+            // 등록값 검증
+            if(redisTemplate.opsForValue().get("Auth : " + email) == null){
+                throw new MemberException(ErrorCode.REDIS_VERIFIED_FALID);
+            }
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_REGIST_FAILED);
+        }
+    }
+
+    // Token 정보추출
+    public String loadAuthFromRedis(String email){
+        try{
+            String data = (String) redisTemplate.opsForValue().get("RT : " + email);
+            if(data == null || data.isEmpty()){
+                throw new MemberException(ErrorCode.REDIS_AUTH_NOT_FOUND);
+            }else{
+                return data;
+            }
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_AUTH_LOAD_FAILED);
+        }
+    }
+    // 인증번호 정보추출
+    public String loadNumFromRedis(String email){
+        try{
+            String data = (String) redisTemplate.opsForValue().get("Auth : " + email);
+            if(data == null || data.isEmpty()){
+                throw new MemberException(ErrorCode.REDIS_NUM_EXPIRED);
+            }else{
+                return data;
+            }
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_NUM_LOAD_FAILED);
+        }
+    }
+
+    // Token 정보삭제
+    public void deleteFromRedis(String email, String token, long expiredTime){
+        try{
+            // Redis 저장데이터 검증
+            if(redisTemplate.opsForValue().get("RT : " + email) == null){
+                throw new MemberException(ErrorCode.REDIS_SAVED_INFO_NOT_FOUND);
+            }
+
+            // Redis 저장데이터 삭제
+            redisTemplate.delete("RT : " + email);
+
+            // 만료정보 Redis 등록
+            redisTemplate.opsForValue()
+                    .set(token, "logout", expiredTime, TimeUnit.MILLISECONDS);
+
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_DELETE_FAILED);
+        }
+    }
+    // 인증 정보삭제
+    public void deleteFromRedis(String email){
+        try{
+            // Redis 저장데이터 검증
+            if(redisTemplate.opsForValue().get("Auth : " + email) == null){
+                throw new MemberException(ErrorCode.REDIS_SAVED_INFO_NOT_FOUND);
+            }
+
+            // Redis 저장데이터 삭제
+            redisTemplate.delete("Auth : " + email);
+
+        }catch(MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_DELETE_FAILED);
+        }
     }
 }

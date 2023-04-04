@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TokenService {
     private final MemberRepository memberRepository;
     public boolean isMemberValid(String memberEmail){
-        if(memberRepository.findByMemberEmail(memberEmail) == null){
+        if(memberRepository.findByMemberEmail(memberEmail).isEmpty()){
             return false;
         }return true;
     }

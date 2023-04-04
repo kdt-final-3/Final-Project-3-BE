@@ -103,13 +103,8 @@ public class JwtManager {
     // 토큰 유효성 확인
     public boolean isValid(String token){
         try{
-            if(
-                    (extractClaims(token) != null) &&
-                    (tokenService.isMemberValid(extractMember(token)))
-            ){
-                return true;
-            }
-            return false;
+            return (extractClaims(token) != null) &&
+                    (tokenService.isMemberValid(extractMember(token)));
         } catch (SecurityException | MalformedJwtException err) {
             log.error("Invalid JWT Token", err);
             throw new AuthException(ErrorCode.INVALID_TOKEN);
