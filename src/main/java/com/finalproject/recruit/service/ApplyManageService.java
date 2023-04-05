@@ -6,6 +6,8 @@ import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
 import com.finalproject.recruit.dto.applymanage.CountAndDateResponseDTO;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
+import com.finalproject.recruit.exception.applyManage.ApplyManageException;
+import com.finalproject.recruit.exception.applyManage.ErrorCode;
 import com.finalproject.recruit.parameter.ApplyProcedure;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
@@ -16,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,44 +29,97 @@ public class ApplyManageService {
     private final RecruitRepository recruitRepository;
     private final Response response;
 
-    /**
-     * 지원자 전체 조회 (선택된 채용공고에 해당하는)
-     * @param recruitId
-     * @return
-     */
+    /*===========================
+      지원자 전체 조회 (선택된 채용공고에 해당하는)
+    ===========================
+    * @param recruitId
+    * @return
+    */
     public ResponseEntity<?> findAllApplicants(Long recruitId) {
-        Recruit findRecruit = recruitRepository.findByRecruitId(recruitId).get();
-        StringTokenizer st = new StringTokenizer(findRecruit.getKeywordStandard(), ","); //채용폼 키워드 분리
+        try{
+            // 채용폼 키워드 추출
+            HashSet<String> keywordStandard = extractKeywordFromRecruitForm(recruitId);
 
-        HashSet<String> keywordStandard = new HashSet<>();
-
-        while (st.hasMoreTokens()) { //HashSet에 기준 키워드 저장 (기업 측이 선정한)
-            keywordStandard.add(st.nextToken());
-        }
-
-        List<ApplyResponseDTO> data = applyRepository.findByRecruitRecruitId(recruitId)
-                .stream().map(ApplyResponseDTO::new)
-                .collect(Collectors.toList());
-
-        for (ApplyResponseDTO dto : data) {
-            int score = 0;
-            List<String> applyKeywords = new ArrayList<>();
-            st = new StringTokenizer(dto.getKeywords(), ",");
-
-            while (st.hasMoreTokens()) {
-                String keyword = st.nextToken();
-                applyKeywords.add(keyword); //키워드를 배열로 저장해서 반환
-                if (keywordStandard.contains(keyword)) { //기준 키워드와 동일 시 가점 추가
-                    score++;
-                }
+            // 인재 지원서 추출
+            List<ApplyResponseDTO> data = applyRepository.findByRecruitRecruitId(recruitId)
+                    .stream().map(ApplyResponseDTO::new)
+                    .collect(Collectors.toList());
+            if(data.isEmpty()){
+                return response.fail(
+                        ErrorCode.APPLY_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLY_NOT_FOUND.getStatus());
             }
 
-            dto.setScore(score); //가점 반환
-            dto.setKeywordList(applyKeywords); //키워드 배열 반환
+            // 키워드 연산
+            for (ApplyResponseDTO dto : data) {
+                calcKeywordScore(dto, keywordStandard);
+            }
+            return response.success(
+                    data,
+                    "SuccessFully FindAll Applicants");
+        }catch(ApplyManageException e){
+            e.printStackTrace();
+            throw new ApplyManageException(ErrorCode.APPLICANTS_FOUND_FAILED);
         }
-
-        return response.success(data);
     }
+
+    public HashSet<String> extractKeywordFromRecruitForm(Long recruitId){
+        try{
+            // 채용폼 키워드 추출
+            Recruit findRecruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.RECRUIT_FORM_NOT_FOUND));
+            StringTokenizer st = new StringTokenizer(findRecruit.getKeywordStandard(), ","); //채용폼 키워드 분리
+            HashSet<String> keywordStandard = new HashSet<>();
+
+            // HashSet에 기준 키워드 저장 (기업 측이 선정한)
+            while (st.hasMoreTokens()) {
+                keywordStandard.add(st.nextToken());
+            }
+
+            return keywordStandard;
+        }catch(ApplyManageException e){
+            e.printStackTrace();
+            throw new ApplyManageException(ErrorCode.RECRUIT_FROM_KEYWORD_EXTRACTION_FAILED);
+        }
+    }
+
+    public void calcKeywordScore(ApplyResponseDTO dto, HashSet<String> keywordStandard){
+        try{
+
+            //키워드를 배열로 저장해서 반환
+            List<String> applyKeywords = Arrays.asList(dto.getKeywords().split(","));
+
+            //기준 키워드와 동일 시 가점 추가
+            int score = (int) applyKeywords.stream().filter(keywordStandard::contains).count();
+
+            dto.setScore(score);                //가점 반환
+            dto.setKeywordList(applyKeywords);  //키워드 배열 반환
+
+        }catch(ApplyManageException e){
+            e.printStackTrace();
+            throw new ApplyManageException(
+                    ErrorCode.KEYWORD_SCORE_CALCULATION_FAILED,
+                    String.format("ApplyId : %s - %s", dto.getApplyId(),
+                            ErrorCode.KEYWORD_SCORE_CALCULATION_FAILED.getMessage())
+            );
+        }
+    }
+
+    /* Archive
+    int score = 0;
+    List<String> applyKeywords = new ArrayList<>();
+    StringTokenizer st = new StringTokenizer(dto.getKeywords(), ",");
+
+    while (st.hasMoreTokens()) {
+        String keyword = st.nextToken();
+        applyKeywords.add(keyword); //키워드를 배열로 저장해서 반환
+        if (keywordStandard.contains(keyword)) { //기준 키워드와 동일 시 가점 추가
+            score++;
+        }
+    }
+    */
+
+
 
     /**
      * 채용단계별 지원자 조회

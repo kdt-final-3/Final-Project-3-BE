@@ -29,11 +29,8 @@ import java.util.concurrent.TimeUnit;
 public class MemberService {
 
     private final MemberRepository memberRepo;
-
     private final Response response;
-
     private final RedisTemplate redisTemplate;
-
     private final JwtProperties properties;
     private final PasswordEncoder encoder;
 
@@ -42,7 +39,6 @@ public class MemberService {
     private final MailRepository mailRepository;
 
     private final JavaMailSender mailSender;
-
     private static final Long TIME_OUT = 3 * 60 * 1800L;
 
     /*===========================
@@ -306,7 +302,6 @@ public class MemberService {
 
             // Redis 등록
             registToRedis(memberEmail, resultNum);
-
 
             return response.success("Successfully Send Authorization Info");
         }
