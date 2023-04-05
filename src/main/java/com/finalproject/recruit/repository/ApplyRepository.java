@@ -17,6 +17,8 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     Page<Apply> findByRecruitRecruitIdAndFailApplyIsTrue(Long recruitId, Pageable pageable);
 
+    Page<Apply> findByApplyNameAndRecruitRecruitIdAndFailApplyIsTrue(String applyName, Long recruitId, Pageable pageable);
+
     List<Apply> findByRecruitRecruitId(Long recruitId);
 
     Page<Apply> findByRecruitRecruitId(Long recruitId, Pageable pageable);
