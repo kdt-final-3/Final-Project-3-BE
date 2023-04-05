@@ -1,9 +1,11 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.service.KeepService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController()
@@ -18,9 +20,9 @@ public class KeepController {
      * 최근 등록 채용폼의 탈락 인재 조회
      * */
     @GetMapping("/home")
-    public ResponseEntity<?> recentRecruit(Pageable pageable){
-        String email = "a@naver.com";
-        return keepService.recentRecruit(email, pageable);
+    public ResponseEntity<?> recentRecruit(Authentication authentication , Pageable pageable){
+        AuthDTO memberInfo = (AuthDTO) authentication.getPrincipal();
+        return keepService.recentRecruit(memberInfo.getMemberEmail(), pageable);
     }
 
     /**

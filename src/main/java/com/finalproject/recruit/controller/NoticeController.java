@@ -1,11 +1,13 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.dto.notice.EmailReq;
 import com.finalproject.recruit.dto.notice.SelectStepReq;
 import com.finalproject.recruit.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController()
@@ -19,9 +21,9 @@ public class NoticeController {
      * 기업의 채용폼 목록 조회
      * */
     @GetMapping
-    public ResponseEntity<?> recruitList(){
-        String email = "a@naver.com";
-        return noticeService.recruitList(email);
+    public ResponseEntity<?> recruitList(Authentication authentication){
+        AuthDTO memberInfo = (AuthDTO) authentication.getPrincipal();
+        return noticeService.recruitList(memberInfo.getMemberEmail());
     }
 
     /**
@@ -34,7 +36,7 @@ public class NoticeController {
 
 
     /**
-     * 이메일 보내기 (일단 1인)
+     * 단체 이메일 보내기
      * */
     @PostMapping("/send")
     public ResponseEntity<?> sendEmail(@RequestBody EmailReq emailReq){
@@ -47,7 +49,6 @@ public class NoticeController {
      * */
     @GetMapping("/status/{recruitId}")
     public ResponseEntity<?> messageHistory(@PathVariable Long recruitId){
-        String email = "a@naver.com";
         return noticeService.messageHistory(recruitId);
     }
 
