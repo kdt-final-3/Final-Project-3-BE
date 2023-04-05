@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 
+    EXPIRED_REDIS_TOKEN(HttpStatus.BAD_REQUEST, "Expired Token."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Access Information Invalid "),
     INVALID_HEADER(HttpStatus.UNAUTHORIZED, "Header Information Invalid "),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Access Information Expired"),

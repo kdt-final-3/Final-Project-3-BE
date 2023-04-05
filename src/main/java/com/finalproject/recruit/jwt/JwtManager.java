@@ -4,11 +4,13 @@ import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.exception.authorization.AuthException;
 import com.finalproject.recruit.exception.authorization.ErrorCode;
+import com.finalproject.recruit.exception.member.MemberException;
 import com.finalproject.recruit.service.TokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -22,6 +24,8 @@ import java.util.Optional;
 public class JwtManager {
     private final JwtProperties jwtProperties;
     private final TokenService tokenService;
+
+    private final RedisTemplate redisTemplate;
 
     /*===========================
         토큰 생성
@@ -103,6 +107,9 @@ public class JwtManager {
     // 토큰 유효성 확인
     public boolean isValid(String token){
         try{
+            if (redisTemplate.opsForValue().get(token) != null) {
+                throw new AuthException(ErrorCode.EXPIRED_REDIS_TOKEN);
+            }
             return (extractClaims(token) != null) &&
                     (tokenService.isMemberValid(extractMember(token)));
         } catch (SecurityException | MalformedJwtException err) {
