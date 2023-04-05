@@ -1,7 +1,6 @@
 package com.finalproject.recruit.dto.keep;
 
 import com.finalproject.recruit.entity.Apply;
-import com.finalproject.recruit.parameter.Keywords;
 import com.finalproject.recruit.parameter.ApplyProcedure;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -30,7 +28,7 @@ public class ApplicantsRes {
      private Boolean wish;
      private LocalDateTime createdTime;
      private LocalDateTime recentMessageTime;
-     private List<Keywords> keywords;
+     private List<String> keywords;
 
      public static ApplicantsRes fromApply(Apply apply , LocalDateTime recentMessageTime){
           return ApplicantsRes.builder()
@@ -50,12 +48,10 @@ public class ApplicantsRes {
                   .build();
      }
 
-     public static List<Keywords> doSplit(String keywordsSelect){
+     public static List<String> doSplit(String keywordsSelect){
           if (keywordsSelect != null) {
                final String[] split = keywordsSelect.split(",");
-               return Arrays.stream(split)
-                       .map(Keywords::valueOf)
-                       .collect(Collectors.toList());
+               return Arrays.asList(split);
           } else{
                return new ArrayList<>();
           }

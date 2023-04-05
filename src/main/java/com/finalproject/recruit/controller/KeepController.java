@@ -42,4 +42,9 @@ public class KeepController {
         return keepService.eternalDeleteApplicants(recruitId, pageable);
     }
 
+    @GetMapping("/view-applicant/search")
+    public ResponseEntity<?> searchDropApplicants(@RequestParam String applyName, Long recruitId, Pageable pageable){
+        return keepService.searchDropApplicants(recruitId, applyName, pageable);
+    }
+
 }

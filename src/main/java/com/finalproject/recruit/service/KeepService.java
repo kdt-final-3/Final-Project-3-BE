@@ -13,7 +13,6 @@ import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,5 +119,27 @@ public class KeepService {
     ===========================*/
     public boolean hasContents(Page<?> input){
         return input.hasContent();
+    }
+
+    public ResponseEntity<?> searchDropApplicants(Long recruitId,String applyName, Pageable pageable) {
+        Page<Apply> searchDropApplicants = applyRepository.findByApplyNameAndRecruitRecruitIdAndFailApplyIsTrue(applyName,recruitId,pageable);
+        // empty check
+        if(!hasContents(searchDropApplicants)){
+            return response.fail(
+                    ErrorCode.APPLY_NOT_FOUND.getMessage(),
+                    ErrorCode.APPLY_NOT_FOUND.getStatus());
+        }
+
+        Page<ApplicantsRes> applicantsResList = searchDropApplicants
+                .map(apply -> ApplicantsRes.fromApply(
+                        apply,
+                        mailRepository.findTopByApplyApplyIdOrderByCreatedTimeDesc(apply.getApplyId())
+                                .map(Mail::getCreatedTime)
+                                .orElse(null)));
+
+        return response.success(
+                applicantsResList,
+                "Successfully Get Deleted Applicants List"
+        );
     }
 }
