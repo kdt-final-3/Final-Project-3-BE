@@ -3,9 +3,11 @@ package com.finalproject.recruit.jwt;
 import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.exception.authorization.AuthException;
 import com.finalproject.recruit.exception.authorization.ErrorCode;
+import com.finalproject.recruit.exception.member.MemberException;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtManager jwtManager;
 
     @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
     @Builder
     private JwtFilter(JwtManager jwtManager){
         this.jwtManager = jwtManager;
@@ -40,10 +45,15 @@ public class JwtFilter extends OncePerRequestFilter {
         // Header 추출
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
+
+
+
         try{
             // 토큰 검증 & 검증유저 return
             AuthDTO member = jwtManager.getMemberInfoOf(header).orElseThrow(
                     () -> new AuthException(ErrorCode.INVALID_TOKEN));
+
+
 
             // 검증정보 Controller return
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
