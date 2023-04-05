@@ -1,17 +1,16 @@
 package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
-import com.finalproject.recruit.entity.Apply;
-import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.dto.applicant.ApplicationReq;
 import com.finalproject.recruit.dto.applicant.PreRequired;
+import com.finalproject.recruit.entity.Apply;
+import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.exception.applicant.ApplicantException;
 import com.finalproject.recruit.exception.applicant.ErrorCode;
 import com.finalproject.recruit.repository.ApplyRepository;
 import com.finalproject.recruit.repository.RecruitRepository;
 import com.finalproject.recruit.repository.apply.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
