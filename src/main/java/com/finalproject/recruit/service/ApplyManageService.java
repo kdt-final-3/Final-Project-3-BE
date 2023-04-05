@@ -44,20 +44,21 @@ public class ApplyManageService {
             List<ApplyResponseDTO> data = applyRepository.findByRecruitRecruitId(recruitId)
                     .stream().map(ApplyResponseDTO::new)
                     .collect(Collectors.toList());
-            if(data.isEmpty()){
+
+            if (data.isEmpty()) {
                 return response.fail(
-                        ErrorCode.APPLY_NOT_FOUND.getMessage(),
-                        ErrorCode.APPLY_NOT_FOUND.getStatus());
+                        ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
             }
 
             // 키워드 연산
             for (ApplyResponseDTO dto : data) {
                 calcKeywordScore(dto, keywordStandard);
             }
-            return response.success(
-                    data,
-                    "SuccessFully FindAll Applicants");
-        }catch(ApplyManageException e){
+
+            return response.success(data, "SuccessFully FindAll Applicants");
+
+        } catch(ApplyManageException e){
             e.printStackTrace();
             throw new ApplyManageException(ErrorCode.APPLICANTS_FOUND_FAILED);
         }
@@ -77,7 +78,8 @@ public class ApplyManageService {
             }
 
             return keywordStandard;
-        }catch(ApplyManageException e){
+
+        } catch(ApplyManageException e) {
             e.printStackTrace();
             throw new ApplyManageException(ErrorCode.RECRUIT_FROM_KEYWORD_EXTRACTION_FAILED);
         }
@@ -85,7 +87,6 @@ public class ApplyManageService {
 
     public void calcKeywordScore(ApplyResponseDTO dto, HashSet<String> keywordStandard){
         try{
-
             //키워드를 배열로 저장해서 반환
             List<String> applyKeywords = Arrays.asList(dto.getKeywords().split(","));
 
@@ -128,13 +129,26 @@ public class ApplyManageService {
      * @return
      */
     public ResponseEntity<?> findApplicantByProcedure(Long recruitId, String procedure) {
-        ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
+        try {
 
-        List<ApplyResponseDTO> data = applyRepository.findByRecruit_RecruitIdAndApplyProcedure(recruitId, applyProcedure)
-                .stream().map(ApplyResponseDTO::new)
-                .collect(Collectors.toList());
+            ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
 
-        return response.success(data);
+            List<ApplyResponseDTO> data = applyRepository.findByRecruit_RecruitIdAndApplyProcedure(recruitId, applyProcedure)
+                    .stream().map(ApplyResponseDTO::new)
+                    .collect(Collectors.toList());
+
+            if (data.isEmpty()) {
+                return response.fail(
+                        ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
+            }
+
+            return response.success(data);
+
+        } catch (ApplyManageException e) {
+            e.printStackTrace();
+            throw new ApplyManageException(ErrorCode.APPLICANTS_FOUND_FAILED);
+        }
     }
 
     /**
@@ -146,15 +160,22 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> changeApplyProcedure(Long applyId, String procedure) {
         try {
+
             ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
 
-            Apply findApply = applyRepository.findByApplyId(applyId).get();
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
             findApply.changeProcedure(applyProcedure);
-        } catch (Exception e) {
-            return response.fail("채용단계 수정에 실패하였습니다.");
+
+        } catch (ApplyManageException e) {
+            e.printStackTrace();
+            return response.fail(
+                    ErrorCode.FAIL_CHANGE_APPLICANTS_PROCEDURE.getMessage(),
+                    ErrorCode.FAIL_CHANGE_APPLICANTS_PROCEDURE.getStatus());
         }
 
-        return response.success("채용단계 수정에 성공하였습니다.");
+        return response.success("Success to change applicant procedure!");
     }
 
     /**
@@ -165,18 +186,23 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> changePassOrFail(Long applyId) {
         try {
-            Apply findApply = applyRepository.findByApplyId(applyId).get();
 
-            if (!findApply.isPass()) {
-                findApply.changePass();
-            } else {
-                findApply.cancelPass();
-            }
-        } catch (Exception e) {
-            return response.fail("지원자 합격 / 불합격 처리에 실패했습니다.");
+            Apply findApply = applyRepository.findByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
+
+            if (!findApply.isPass()) findApply.changePass();
+            else findApply.cancelPass();
+
+        } catch (ApplyManageException e) {
+            e.printStackTrace();
+            return response.fail(
+                    ErrorCode.FAIL_CHANGE_APPLICANT_PASS_OR_FAIL.getMessage(),
+                    ErrorCode.FAIL_CHANGE_APPLICANT_PASS_OR_FAIL.getStatus()
+            );
         }
 
-        return response.success("지원자 합격 / 불합격 처리에 성공하였습니다.");
+        return response.success("Success to change applicant Pass or Fail!");
     }
 
     /**
@@ -185,64 +211,73 @@ public class ApplyManageService {
      * @return
      */
     public ResponseEntity<?> countApplicantAndProcessAndTime(Long recruitId) {
-        CountAndDateResponseDTO result = new CountAndDateResponseDTO();
+        try {
+            CountAndDateResponseDTO result = new CountAndDateResponseDTO();
 
-        Long totalCount = applyRepository.countApplicantByRecruitId(recruitId); //총 지원자 수 계산
-        result.setTotalCount(totalCount);
+            Long totalCount = applyRepository.countApplicantByRecruitId(recruitId); //총 지원자 수 계산
+            result.setTotalCount(totalCount);
 
-        LocalDateTime now = LocalDateTime.now();
-        Long todayCount = applyRepository.countApplicantByRecruitIdAndCreatedTime(recruitId, now.toLocalDate()); // 오늘 지원자 수 계산
-        result.setTodayCount(todayCount);
+            LocalDateTime now = LocalDateTime.now();
+            Long todayCount = applyRepository.countApplicantByRecruitIdAndCreatedTime(recruitId, now.toLocalDate()); // 오늘 지원자 수 계산
+            result.setTodayCount(todayCount);
 
-        Recruit findRecruit = recruitRepository.findByRecruitId(recruitId).get();
-        if (now.isBefore(findRecruit.getDocsStart())) { //오늘 날짜가 서류 시작일 전이면 채용 시작 전
+            Recruit findRecruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.RECRUIT_FORM_NOT_FOUND)
+            );
 
-            result.setProcess("채용 시작 전");
+            if (now.isBefore(findRecruit.getDocsStart())) { //오늘 날짜가 서류 시작일 전이면 채용 시작 전
 
-            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsStart().toLocalDate()); //날짜 차이 계산
-            result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcess("채용 시작 전");
 
-        } else if (now.isAfter(findRecruit.getDocsStart()) && now.isBefore(findRecruit.getDocsEnd())) {
+                Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsStart().toLocalDate()); //날짜 차이 계산
+                result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "남았습니다.");
 
-            result.setProcess("서류전형");
+            } else if (now.isAfter(findRecruit.getDocsStart()) && now.isBefore(findRecruit.getDocsEnd())) {
 
-            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsEnd().toLocalDate()); //날짜 차이 계산
-            result.setProcessFinish("서류전형 마감까지 " + diffDate.getDays() + "일 남았습니다.");
+                result.setProcess("서류전형");
 
-        } else if (now.isAfter(findRecruit.getDocsEnd()) && now.isBefore(findRecruit.getMeetStart())) {
+                Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsEnd().toLocalDate()); //날짜 차이 계산
+                result.setProcessFinish("서류전형 마감까지 " + diffDate.getDays() + "일 남았습니다.");
 
-            result.setProcess("서류전형 마감");
+            } else if (now.isAfter(findRecruit.getDocsEnd()) && now.isBefore(findRecruit.getMeetStart())) {
 
-            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetStart().toLocalDate()); //날짜 차이 계산
-            result.setProcessFinish("면접전형 시작까지 " + diffDate.getDays() + "일 남았습니다.");
+                result.setProcess("서류전형 마감");
 
-        } else if (now.isAfter(findRecruit.getMeetStart()) && now.isBefore(findRecruit.getMeetEnd())) {
+                Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetStart().toLocalDate()); //날짜 차이 계산
+                result.setProcessFinish("면접전형 시작까지 " + diffDate.getDays() + "일 남았습니다.");
 
-            result.setProcess("면접 진행 중");
+            } else if (now.isAfter(findRecruit.getMeetStart()) && now.isBefore(findRecruit.getMeetEnd())) {
 
-            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetEnd().toLocalDate()); //날짜 차이 계산
-            result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcess("면접 진행 중");
 
-        } else if (now.isAfter(findRecruit.getMeetEnd()) && now.isBefore(findRecruit.getConfirmStart())) {
+                Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetEnd().toLocalDate()); //날짜 차이 계산
+                result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "남았습니다.");
 
-            result.setProcess("면접 종료");
+            } else if (now.isAfter(findRecruit.getMeetEnd()) && now.isBefore(findRecruit.getConfirmStart())) {
 
-            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmStart().toLocalDate()); //날짜 차이 계산
-            result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcess("면접 종료");
 
-        } else if (now.isAfter(findRecruit.getConfirmStart()) && now.isBefore(findRecruit.getConfirmEnd())) {
+                Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmStart().toLocalDate()); //날짜 차이 계산
+                result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "남았습니다.");
 
-            result.setProcess("최종 조율 중");
+            } else if (now.isAfter(findRecruit.getConfirmStart()) && now.isBefore(findRecruit.getConfirmEnd())) {
 
-            Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmEnd().toLocalDate()); //날짜 차이 계산
-            result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcess("최종 조율 중");
 
-        } else {
-            result.setProcess("채용마감");
-            result.setProcessFinish("채용이 마감되었습니다.");
+                Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmEnd().toLocalDate()); //날짜 차이 계산
+                result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "남았습니다.");
+
+            } else {
+                result.setProcess("채용마감");
+                result.setProcessFinish("채용이 마감되었습니다.");
+            }
+
+            return response.success(result);
+
+        } catch (ApplyManageException e) {
+            e.printStackTrace();
+            throw new ApplyManageException(ErrorCode.FAIL_COUNT_APPLICANT_AND_CHECK_PROCESS_AND_DAY);
         }
-
-        return response.success(result);
     }
 
     /**
@@ -251,7 +286,9 @@ public class ApplyManageService {
      * @return
      */
     public ResponseEntity<?> findApplicantDetail(Long applyId) {
-        ApplyDetailResponseDTO data = applyRepository.findJoinByApplyId(applyId).map(ApplyDetailResponseDTO::new).get();
+        ApplyDetailResponseDTO data = applyRepository.findJoinByApplyId(applyId).map(ApplyDetailResponseDTO::new).orElseThrow(
+                () -> new ApplyManageException(ErrorCode.FAIL_CHECK_APPLICANT_DETAIL)
+        );
 
         return response.success(data);
     }
@@ -265,13 +302,22 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> writeEvaluation(Long applyId, String evaluation) {
         try {
-            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
+
             findApply.writeEvaluation(evaluation);
-        } catch (Exception e) {
-            return response.fail("지원자 코멘트 등록에 실패하였습니다.");
+
+        } catch (ApplyManageException e) {
+            e.printStackTrace();
+            return response.fail(
+                    ErrorCode.FAIL_COMMENT_APPLICANT.getMessage(),
+                    ErrorCode.FAIL_COMMENT_APPLICANT.getStatus()
+            );
         }
 
-        return response.success("지원자 코멘트 등록에 성공하였습니다.");
+        return response.success("Success to Comment Applicant!");
     }
 
     /**
@@ -282,17 +328,22 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> changeWish(Long applyId) {
         try {
-            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
-            if (!findApply.isWish()) {
-                findApply.changeWish();
-            } else {
-                findApply.cancelWish();
-            }
-        } catch (Exception e) {
-            return response.fail("지원자 찜 등록 / 해제 실패했습니다.");
+
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
+
+            if (!findApply.isWish()) findApply.changeWish();
+            else findApply.cancelWish();
+
+        } catch (ApplyManageException e) {
+            return response.fail(
+                    ErrorCode.FAIL_WISH_APPLICANT.getMessage(),
+                    ErrorCode.FAIL_WISH_APPLICANT.getStatus()
+            );
         }
 
-        return response.success("지원지 찜 등록 / 해제 성공하였습니다.");
+        return response.success("Success to Wish / Cancel wish Applicant!");
     }
 
     /**
@@ -303,17 +354,22 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> dropApply(Long applyId) {
         try {
-            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
-            if (!findApply.isFailApply()) {
-                findApply.changeDrop();
-            } else {
-                findApply.cancelDrop();
-            }
-        } catch (Exception e) {
-            return response.fail("탈락인재 보관함 등록 / 해제 실패하였습니다.");
+
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
+
+            if (!findApply.isFailApply()) findApply.changeDrop();
+            else findApply.cancelDrop();
+
+        } catch (ApplyManageException e) {
+            return response.fail(
+                    ErrorCode.FAIL_DROP_APPLICANT.getMessage(),
+                    ErrorCode.FAIL_DROP_APPLICANT.getStatus()
+            );
         }
 
-        return response.success("탈락인재 보관함 등록 / 해제 성공하였습니다.");
+        return response.success("Success to Move / Cancel Applicant in DropBox!");
     }
 
     /**
@@ -326,16 +382,24 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> setMeetDay(Long applyId, String interviewDate, String interviewTime) {
         try {
+
             String meeting = interviewDate + "T" + interviewTime;
             LocalDateTime meetingDay = LocalDateTime.parse(meeting);
 
-            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
+
             findApply.setMeeting(meetingDay);
+
         } catch (Exception e) {
-            return response.fail("면접일자 등록에 실패하였습니다.");
+            return response.fail(
+                    ErrorCode.FAIL_SET_APPLICANT_MEETING_DAY.getMessage(),
+                    ErrorCode.FAIL_SET_APPLICANT_MEETING_DAY.getStatus()
+            );
         }
 
-        return response.success("면접일자 등록에 성공하였습니다.");
+        return response.success("Success to Set Applicant Meeting Day!");
     }
 
     /**
@@ -346,12 +410,20 @@ public class ApplyManageService {
     @Transactional
     public ResponseEntity<?> checkApplicant(Long applyId) {
         try {
-            Apply findApply = applyRepository.findJoinByApplyId(applyId).get();
+
+            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
+                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
+            );
+
             findApply.setCheckApply();
+
         } catch (Exception e) {
-            return response.fail("서류검토 처리에 실패하였습니다.");
+            return response.fail(
+                    ErrorCode.FAIL_SET_CHECKING_APPLY_DOCS.getMessage(),
+                    ErrorCode.FAIL_SET_CHECKING_APPLY_DOCS.getStatus()
+            );
         }
 
-        return response.success("서류검토 처리에 성공하였습니다.");
+        return response.success("Success to Set Checking Applicant Document!");
     }
 }
