@@ -43,6 +43,12 @@ public class Recruit {
      ===========================*/
 
     /**
+     * 채용폼 타입
+     */
+    @Column(name = "recruit_type")
+    private boolean recruitType;
+
+    /**
      * 채용폼 제목 ex)2022년 패캠 채용폼
      */
     @Column(name = "recruit_title")
@@ -172,6 +178,7 @@ public class Recruit {
     // 신규 채용폼 등록
     public Recruit(RecruitReq req, Member member) {
         this.member = member;
+        this.recruitType = req.isType();
         this.recruitTitle = req.getTitle();
         this.recruitContent = req.getContents();
         this.keywordStandard = req.getKeywordStandard();

@@ -20,19 +20,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RecruitService {
-    private static final String SERVICE_DOMAIN = "https://www.jobkok.com/view";
+    private static final String SERVICE_DOMAIN = "https://jobkok.shop/view";
     private final RecruitRepository recruitRepository;
     private final MemberService memberService;
     private final Response response;
 
     /*===========================
-        채용폼 전체조회
+        채용폼 조회
     ===========================*/
-    public ResponseEntity<?> selectALlRecruit(String memberEmail, boolean recruitStatus) {
+    // 전체조회
+    public ResponseEntity<?> selectALlRecruit(String memberEmail, boolean recruitType, boolean recruitStatus) {
         try {
-            List<Recruit> recruitList = recruitRepository.findAllByMember_MemberEmailAndRecruitOngoing(memberEmail, recruitStatus);
+            List<Recruit> recruitList = recruitRepository.findAllByMember_MemberEmailAndRecruitTypeAndRecruitOngoing(memberEmail, recruitType, recruitStatus);
             return checkRecruitRes(recruitList);
-        } catch (Exception e) {
+        } catch (RecruitException e) {
             e.printStackTrace();
             throw new RecruitException(ErrorCode.UNABLE_TO_GET_RECRUITFORM);
         }
@@ -45,7 +46,7 @@ public class RecruitService {
         try {
             List<Recruit> recruitList = recruitRepository.findAllByMember_MemberEmailAndRecruitOngoingAndRecruitTitleContains(memberEmail, recruitStatus, recruitTitle);
             return checkRecruitRes(recruitList);
-        } catch (Exception e) {
+        } catch (RecruitException e) {
             e.printStackTrace();
             throw new RecruitException(ErrorCode.UNABLE_TO_GET_RECRUITFORM);
         }
