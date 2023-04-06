@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RecruitReq {
+    private boolean type;
     private String title;
     private String contents;
     private String keywordStandard;

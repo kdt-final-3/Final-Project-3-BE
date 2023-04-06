@@ -19,6 +19,7 @@ public class RecruitRes {
     ===========================*/
     private Long id;
     private String uploader;
+    private boolean type;
     private String title;
     private String contents;
     private String keywordStandard;
@@ -34,14 +35,15 @@ public class RecruitRes {
     private LocalDateTime meetEnd;
     private LocalDateTime confirmStart;
     private LocalDateTime confirmEnd;
-    //private List<LocalDateTime> timeline;
+    private LocalDateTime updateAt;
 
     /*===========================
         Custom Constructor
     ===========================*/
     public RecruitRes(Recruit recruit){
         this.id = recruit.getRecruitId();
-        //this.uploader = recruit.getMember().getCompanyName();
+        this.uploader = recruit.getMember().getCompanyName();
+        this.type = recruit.isRecruitType();
         this.title = recruit.getRecruitTitle();
         this.contents = recruit.getRecruitContent();
         this.keywordStandard = recruit.getKeywordStandard();
@@ -55,6 +57,9 @@ public class RecruitRes {
         this.meetEnd = recruit.getMeetEnd();
         this.confirmStart = recruit.getConfirmStart();
         this.confirmEnd = recruit.getConfirmEnd();
+        if(recruit.getRecruitUpdateAt() != null){
+            this.updateAt = recruit.getRecruitUpdateAt().toLocalDateTime();
+        }
     }
 
     /*===========================
@@ -66,18 +71,4 @@ public class RecruitRes {
         return new RecruitRes(entity);
     }
 
-
-    /*===========================
-        Archive
-    ===========================
-    public void updateTimeline(){
-        List<LocalDateTime> timeline = new ArrayList<>();
-        timeline.add(docsStart);
-        timeline.add(docsEnd);
-        timeline.add(meetStart);
-        timeline.add(meetEnd);
-        timeline.add(confirmStart);
-        timeline.add(confirmEnd);
-    }
-     */
 }

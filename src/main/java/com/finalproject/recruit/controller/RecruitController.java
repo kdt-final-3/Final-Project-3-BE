@@ -21,9 +21,13 @@ public class RecruitController {
     // ( true : 진행중 / false : 마감됨  )
     @GetMapping
     public ResponseEntity<?> selectAllRecruit(@RequestParam(name = "status") String recruitStatus,
+                                           @RequestParam(name = "type" ) String recruitType,
                                            Authentication authentication){
         AuthDTO memberInfo = (AuthDTO) authentication.getPrincipal();
-        return recruitService.selectALlRecruit(memberInfo.getMemberEmail(), Boolean.parseBoolean(recruitStatus));
+        return recruitService.selectALlRecruit(
+                memberInfo.getMemberEmail(),
+                Boolean.parseBoolean(recruitType),
+                Boolean.parseBoolean(recruitStatus));
     }
 
     /*===========================
