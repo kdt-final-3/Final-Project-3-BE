@@ -57,7 +57,9 @@ public class RecruitRes {
         this.meetEnd = recruit.getMeetEnd();
         this.confirmStart = recruit.getConfirmStart();
         this.confirmEnd = recruit.getConfirmEnd();
-        this.updateAt = recruit.getRecruitUpdateAt().toLocalDateTime();
+        if(recruit.getRecruitUpdateAt() != null){
+            this.updateAt = recruit.getRecruitUpdateAt().toLocalDateTime();
+        }
     }
 
     /*===========================
