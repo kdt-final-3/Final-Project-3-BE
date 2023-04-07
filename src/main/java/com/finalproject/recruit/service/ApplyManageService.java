@@ -41,7 +41,7 @@ public class ApplyManageService {
             HashSet<String> keywordStandard = extractKeywordFromRecruitForm(recruitId);
 
             // 인재 지원서 추출
-            List<ApplyResponseDTO> data = applyRepository.findByRecruitRecruitId(recruitId)
+            List<ApplyResponseDTO> data = applyRepository.findByRecruit_RecruitId(recruitId)
                     .stream().map(ApplyResponseDTO::new)
                     .collect(Collectors.toList());
 
@@ -59,6 +59,43 @@ public class ApplyManageService {
             return response.success(data, "SuccessFully FindAll Applicants");
 
         } catch(ApplyManageException e){
+            e.printStackTrace();
+            throw new ApplyManageException(ErrorCode.APPLICANTS_FOUND_FAILED);
+        }
+    }
+
+    /**
+     * 채용단계별 지원자 조회
+     * @param recruitId
+     * @param procedure
+     * @return
+     */
+    public ResponseEntity<?> findApplicantByProcedure(Long recruitId, String procedure) {
+        try {
+
+            ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
+
+            List<ApplyResponseDTO> data = applyRepository.findByRecruit_RecruitIdAndApplyProcedure(recruitId, applyProcedure)
+                    .stream().map(ApplyResponseDTO::new)
+                    .collect(Collectors.toList());
+
+            if (data.isEmpty()) {
+                return response.fail(
+                        ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
+                        ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
+            }
+
+            //채용폼 키워드 추출
+            HashSet<String> keywordStandard = extractKeywordFromRecruitForm(recruitId);
+
+            // 키워드 연산
+            for (ApplyResponseDTO dto : data) {
+                calcKeywordScore(dto, keywordStandard);
+            }
+
+            return response.success(data);
+
+        } catch (ApplyManageException e) {
             e.printStackTrace();
             throw new ApplyManageException(ErrorCode.APPLICANTS_FOUND_FAILED);
         }
@@ -120,36 +157,6 @@ public class ApplyManageService {
     }
     */
 
-
-
-    /**
-     * 채용단계별 지원자 조회
-     * @param recruitId
-     * @param procedure
-     * @return
-     */
-    public ResponseEntity<?> findApplicantByProcedure(Long recruitId, String procedure) {
-        try {
-
-            ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
-
-            List<ApplyResponseDTO> data = applyRepository.findByRecruit_RecruitIdAndApplyProcedure(recruitId, applyProcedure)
-                    .stream().map(ApplyResponseDTO::new)
-                    .collect(Collectors.toList());
-
-            if (data.isEmpty()) {
-                return response.fail(
-                        ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
-                        ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
-            }
-
-            return response.success(data);
-
-        } catch (ApplyManageException e) {
-            e.printStackTrace();
-            throw new ApplyManageException(ErrorCode.APPLICANTS_FOUND_FAILED);
-        }
-    }
 
     /**
      * 지원자 채용단계 수정

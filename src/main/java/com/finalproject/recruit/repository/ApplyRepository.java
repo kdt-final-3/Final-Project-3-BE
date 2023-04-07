@@ -33,7 +33,11 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     List<Apply> findByApplyNameAndRecruitRecruitId(String applyName, Long recruitId);
 
+    @EntityGraph(attributePaths = {"career","education","language","military","certificate","activities","awards"})
     List<Apply> findByRecruit_RecruitIdAndApplyProcedure(Long recruitId, ApplyProcedure applyProcedure);
+
+    @EntityGraph(attributePaths = {"career","education","language","military","certificate","activities","awards"})
+    List<Apply> findByRecruit_RecruitId(Long recruitId);
 
     @Query("select count(a) from Apply a where a.recruit.recruitId = :id and a.applyDelete = false")
     Long countApplicantByRecruitId(@Param("id") Long id);
