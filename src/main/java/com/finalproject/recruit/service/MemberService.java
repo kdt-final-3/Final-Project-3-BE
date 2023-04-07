@@ -12,14 +12,12 @@ import com.finalproject.recruit.repository.MailRepository;
 import com.finalproject.recruit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -93,7 +91,8 @@ public class MemberService {
             MemberResDTO.TokenInfo loginInfo = new MemberResDTO.TokenInfo(
                     manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
                     manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
-                    properties.getRefreshTokenExpiredTime()
+                    properties.getRefreshTokenExpiredTime(),
+                    member
             );
 
             // Redis 저장
@@ -131,18 +130,19 @@ public class MemberService {
      ===========================*/
     public ResponseEntity<?> reissue(String accessToken, String memberEmail) {
         try {
-            // 토큰검증
-            if (!manager.isValid(accessToken)) {
-                return response.fail(
-                        ErrorCode.INVALID_TOKEN.getMessage(),
-                        ErrorCode.INVALID_TOKEN.getStatus());
-            }
-            // 회원객체 검증
+            // 회원객체 추출
             Member member = memberRepo.findByMemberEmail(memberEmail).orElseThrow(
                     () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
             // Redis로 부터 refreshToken 추출
             String refreshToken = loadAuthFromRedis(memberEmail);
+
+            // refreshToken 검증
+            if(!checkRefreshToken(refreshToken, memberEmail)){
+                return response.fail(
+                        ErrorCode.INVALID_REFRESH_TOKEN.getMessage(),
+                        ErrorCode.INVALID_REFRESH_TOKEN.getStatus());
+            }
 
             // 토큰 신규발급
             MemberResDTO.TokenInfo memberInfo = new MemberResDTO.TokenInfo(
@@ -160,6 +160,23 @@ public class MemberService {
         } catch (MemberException e) {
             e.printStackTrace();
             throw new MemberException(ErrorCode.EXTEND_TOKEN_TIME_FAILED);
+        }
+    }
+
+    // refreshToken 검증 메소드
+    public boolean checkRefreshToken(String token, String email){
+        try{
+            String extractMember = manager.extractMember(token);
+            long expiredTime = manager.expiredTime(token);
+            long now = System.currentTimeMillis();
+
+            if((expiredTime > now) && (extractMember.equals(email))) {
+                return true;
+            }
+            return false;
+        }catch (MemberException e){
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 
@@ -202,7 +219,6 @@ public class MemberService {
                     ErrorCode.UNABLE_TO_PROCESS_REQUEST.getMessage(),
                     ErrorCode.UNABLE_TO_PROCESS_REQUEST.getStatus());
         }
-
     }
 
     // 비밀번호 변경 & 검증
@@ -213,7 +229,7 @@ public class MemberService {
             Member updateMember = memberRepo.save(member);
 
             // 비밀번호 업데이트 검증
-            if(!checkPassword(member.getPassword(), updateMember.getPassword())){
+            if(!member.getPassword().equals(updateMember.getPassword())){
                 throw new MemberException(ErrorCode.PASSWORD_UPDATE_FAILED);
             }
 
