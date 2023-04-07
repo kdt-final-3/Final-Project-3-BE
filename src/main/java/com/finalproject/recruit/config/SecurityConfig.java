@@ -40,7 +40,7 @@ public class SecurityConfig {
     ===========================*/
     // 아래 URL은 권한검사X
     private static final String[] PUBLIC_URLS = {
-            "/userIdValidation","/test", "/view/**", "/auth/login", "/auth/signup"
+            "/userIdValidation","/test", "/view/**", "/auth/login", "/auth/signup", "/auth/number"
     };
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { //시큐리티 filter 제외, 그러나 OncePerRequestFilter는 시큐리티 필터가 아니라서 로직실행
