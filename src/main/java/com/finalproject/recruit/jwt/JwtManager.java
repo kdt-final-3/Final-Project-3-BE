@@ -24,7 +24,6 @@ import java.util.Optional;
 public class JwtManager {
     private final JwtProperties jwtProperties;
     private final TokenService tokenService;
-
     private final RedisTemplate redisTemplate;
 
     /*===========================
@@ -47,6 +46,10 @@ public class JwtManager {
     public String generateRefreshToken(Member member, Long expiredTime){
         Date now = new Date();
         return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setIssuedAt(now)
+                .claim("memberEmail", member.getMemberEmail())
+                .claim("role", "ROLE_MEMBER")
                 .setExpiration(new Date(now.getTime() + expiredTime))
                 .signWith(SignatureAlgorithm.HS256, getKey(jwtProperties.getSecretKey()))
                 .compact();
@@ -127,9 +130,14 @@ public class JwtManager {
         }
     }
 
-    // 토큰 발급자 확인
+    // 토큰정보 추출
     public String extractMember(String token){
         return extractClaims(token).get("memberEmail", String.class);
+    }
+
+    // 토큰만료값 추출
+    public long expiredTime(String token){
+        return extractClaims(token).getExpiration().getTime();
     }
 
     /*===========================

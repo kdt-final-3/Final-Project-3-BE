@@ -13,6 +13,7 @@ public enum ErrorCode {
     INCORRECT_AUTH_NUM(HttpStatus.UNAUTHORIZED, "Authorization Number Incorrect"),
     MISMATCH_PASSWORD(HttpStatus.BAD_REQUEST, "Mismatch Password"),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid Token Information"),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Invalid Refresh Token Information"),
     ALREADY_EXIST(HttpStatus.CONFLICT, "Aleady Registed Email"),
     REDIS_SAVED_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "Redis Saved Data Not Found"),
     REDIS_AUTH_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "Requested TokenInfo from Redis Not Found"),
