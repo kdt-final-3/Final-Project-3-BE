@@ -31,7 +31,6 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtManager jwtManager;
-    private final RedisTemplate redisTemplate;
     @Autowired
     private CustomAuthEntryPoint customAuthEntryPoint;
 
@@ -40,7 +39,7 @@ public class SecurityConfig {
     ===========================*/
     // 아래 URL은 권한검사X
     private static final String[] PUBLIC_URLS = {
-            "/userIdValidation","/test", "/view/**", "/auth/login", "/auth/signup", "/auth/number"
+            "/test", "/view/**", "/auth/login", "/auth/signup", "/auth/number"
     };
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { //시큐리티 filter 제외, 그러나 OncePerRequestFilter는 시큐리티 필터가 아니라서 로직실행
@@ -65,6 +64,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(customAuthEntryPoint)     // 토큰없이 접근하는 경우에 대해 Exception 발생
                 .and()
                 .cors()
+                .configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().disable()       // rest api이므로 csrf 보안이 필요없으므로 disable처리
                 .httpBasic().disable()  // 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
@@ -74,24 +74,6 @@ public class SecurityConfig {
                 .build();
         //인증을 처리하는 기본필터 UsernamePasswordAuthenticationFilter 대신 별도의 인증 로직을 가진 필터를 생성하고 사용하고 싶을 때 아래와 같이 필터를 등록하고 사용
     }
-
-        /*
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/sign-up", "/login", "/authority", "/reissue", "/logout", "/drop/**", "/notice/**", "/view/**").permitAll()
-                .antMatchers("/userTest").hasRole("USER")
-                .antMatchers("/adminTest").hasRole("ADMIN")
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(provider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
-        // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 적용시킨다.
-    }
-     */
-
 
     /*===========================
         CORS
@@ -123,7 +105,6 @@ public class SecurityConfig {
 
         return source;
     }
-
 
     /*===========================
         ETC
