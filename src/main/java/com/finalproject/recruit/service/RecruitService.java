@@ -29,9 +29,9 @@ public class RecruitService {
         채용폼 조회
     ===========================*/
     // 전체조회
-    public ResponseEntity<?> selectALlRecruit(String memberEmail, boolean recruitType, boolean recruitStatus) {
+    public ResponseEntity<?> selectALlRecruit(String memberEmail, boolean recruitStatus) {
         try {
-            List<Recruit> recruitList = recruitRepository.findAllByMember_MemberEmailAndRecruitTypeAndRecruitOngoing(memberEmail, recruitType, recruitStatus);
+            List<Recruit> recruitList = recruitRepository.findAllByMember_MemberEmailAndRecruitOngoing(memberEmail, recruitStatus);
             return checkRecruitRes(recruitList);
         } catch (RecruitException e) {
             e.printStackTrace();
