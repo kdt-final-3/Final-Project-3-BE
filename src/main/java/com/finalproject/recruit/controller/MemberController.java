@@ -59,7 +59,7 @@ public class MemberController {
     /**
      * 이메일 중복 체크
      **/
-    @GetMapping("/auth/email_validation")
+    @PostMapping("/auth/email_validation")
     public ResponseEntity<?> validateEmail(@RequestBody MemberReqDTO.EmailValidate emailValidate) {
         return memberService.existEmail(emailValidate.getMemberEmail());
     }
@@ -92,13 +92,13 @@ public class MemberController {
         return memberService.dropMember(memberEmail);
     }
 
-    @PostMapping("/auth/number")
+    @PostMapping("/auth/send_number")
     public ResponseEntity<?> sendAuthNumber(@RequestParam("memberEmail") String memberEmail) {
         System.out.println(memberEmail);
         return memberService.sendAuthNumber(memberEmail);
     }
 
-    @GetMapping("/auth/number")
+    @PostMapping("/auth/check_number")
     public ResponseEntity<?> authNumber(@RequestBody MemberReqDTO.AuthMail authMail) {
         return memberService.numberAuth(authMail);
     }
