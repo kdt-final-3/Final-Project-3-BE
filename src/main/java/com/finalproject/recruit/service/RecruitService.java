@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RecruitService {
-    private static final String SERVICE_DOMAIN = "https://jobkok.shop/view";
+    private static final String SERVICE_DOMAIN = "https://jobkok.shop/applicant/auth";
     private final RecruitRepository recruitRepository;
     private final MemberService memberService;
     private final Response response;

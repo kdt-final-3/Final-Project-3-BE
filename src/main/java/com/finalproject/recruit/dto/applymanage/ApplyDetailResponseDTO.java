@@ -21,7 +21,13 @@ public class ApplyDetailResponseDTO {
     String applyPhone;
     String applyEmail;
     String resumeContent;
+    Boolean disorder;
+    Boolean veteran;
+    Boolean employment;
+    Boolean terms;
+    MilitaryEnum militaryEnum;
     String applyPortfolio;
+    String applyResume;
     ApplyProcedure applyProcedure;
     String evaluation;
     Boolean pass;
@@ -39,9 +45,7 @@ public class ApplyDetailResponseDTO {
     LocalDateTime eduStart;
     LocalDateTime eduEnd;
     String languageName;
-    String languageSkill;
     LanguageLevel languageLevel;
-    MilitaryEnum militaryEnum;
     String certificateName;
     LocalDateTime certificateDate;
     String certificatePublisher;
@@ -59,7 +63,13 @@ public class ApplyDetailResponseDTO {
         this.applyPhone = apply.getApplyPhone();
         this.applyEmail = apply.getApplyEmail();
         this.resumeContent = apply.getResumeContent();
+        this.disorder = apply.isDisorder();
+        this.veteran = apply.isVeteran();
+        this.employment = apply.isEmployment();
+        this.terms = apply.isTerms();
+        this.militaryEnum = apply.getMilitaryEnum();
         this.applyPortfolio = apply.getApplyPortfolio();
+        this.applyResume = apply.getApplyResume();
         this.applyProcedure = apply.getApplyProcedure();
         this.evaluation = apply.getEvaluation();
         this.pass = apply.isPass();
@@ -77,9 +87,7 @@ public class ApplyDetailResponseDTO {
         this.eduStart = apply.getEducation().getEduStart();
         this.eduEnd = apply.getEducation().getEduEnd();
         this.languageName = apply.getLanguage().getLanguageName();
-        this.languageSkill = apply.getLanguage().getLanguageSkill();
         this.languageLevel = apply.getLanguage().getLanguageLevel();
-        this.militaryEnum = apply.getMilitaryEnum();
         this.certificateName = apply.getCertificate().getCertificateName();
         this.certificateDate = apply.getCertificate().getCertificateDate();
         this.certificatePublisher = apply.getCertificate().getCertificatePublisher();

@@ -2,10 +2,7 @@ package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.keep.ApplicantsRes;
-import com.finalproject.recruit.dto.notice.EmailReq;
-import com.finalproject.recruit.dto.notice.MessageHistoryRes;
-import com.finalproject.recruit.dto.notice.NoticeRecruitsRes;
-import com.finalproject.recruit.dto.notice.SelectStepReq;
+import com.finalproject.recruit.dto.notice.*;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.entity.Mail;
@@ -168,8 +165,8 @@ public class NoticeService {
         if(req.getNoticeStep() == null){
             throw new NoticeException(ErrorCode.INVALID_STEP);
         }else if (req.getNoticeStep().name().equals(NoticeStep.MEET_PROPOSAL.name())) {
-            msg += " 면접 날짜는 "+ interviewDate + "입니다. " +
-                    "잘 준비하셔서 좋은 성과 있으시길 바랍니다. ";
+            msg += " 면접 날짜는 "+ interviewDate + "입니다. " + System.lineSeparator()+
+                    "잘 준비하셔서 좋은 성과 있으시길 바랍니다. " + System.lineSeparator();
         }
         msg += "감사합니다. ";
         return msg;
@@ -228,10 +225,11 @@ public class NoticeService {
                 .orElseThrow(() -> new NoticeException(ErrorCode.RECRUIT_FORM_NOT_FOUND));
 
         String message =
-                "안녕하세요. " + recruit.getMember().getCompanyName() + "입니다. " +
-                "저희 " + recruit.getRecruitTitle() + "에 관심을 가지고 지원해 주셔서 감사합니다. ";
+                "안녕하세요. " + recruit.getMember().getCompanyName() + "입니다." + System.lineSeparator()+
+                "저희 " + recruit.getRecruitTitle() + "에 관심을 가지고 지원해 주셔서 감사합니다."+System.lineSeparator();
 
-        message += selectStepReq.getNoticeStep().getMessage();
+        System.out.println(message);
+        message += selectStepReq.getNoticeStep().getMessage()+System.lineSeparator();
 
         return response.success(
                 message,
@@ -260,8 +258,10 @@ public class NoticeService {
                                     .map(Mail::getCreatedTime)
                                     .orElse(null)))
                     .collect(Collectors.toList());
+
+
             // empty check
-            if(hasContents(applicantsResList)){
+            if(!hasContents(applicantsResList)){
                 return response.fail(
                         ErrorCode.APPLICANTS_NOT_FOUND.getMessage(),
                         ErrorCode.APPLICANTS_NOT_FOUND.getStatus());
