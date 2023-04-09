@@ -237,7 +237,7 @@ public class ApplyManageService {
                 result.setProcess("채용 시작 전");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsStart().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else if (now.isAfter(findRecruit.getDocsStart()) && now.isBefore(findRecruit.getDocsEnd())) {
 
@@ -258,21 +258,21 @@ public class ApplyManageService {
                 result.setProcess("면접 진행 중");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetEnd().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else if (now.isAfter(findRecruit.getMeetEnd()) && now.isBefore(findRecruit.getConfirmStart())) {
 
                 result.setProcess("면접 종료");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmStart().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else if (now.isAfter(findRecruit.getConfirmStart()) && now.isBefore(findRecruit.getConfirmEnd())) {
 
                 result.setProcess("최종 조율 중");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmEnd().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else {
                 result.setProcess("채용마감");
