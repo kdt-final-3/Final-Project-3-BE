@@ -1,5 +1,7 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.applymanage.EvaluationReq;
+import com.finalproject.recruit.dto.applymanage.MeetingDateReq;
 import com.finalproject.recruit.service.ApplyManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -72,9 +74,9 @@ public class ApplyManageController {
      */
     @PutMapping("/apply/note/{applyId}")
     public ResponseEntity<?> writeEvaluation(@PathVariable Long applyId,
-                                             @RequestParam(name = "evaluation") String evaluation) {
+                                             @RequestBody EvaluationReq evaluationReq) {
 
-        return applyManageService.writeEvaluation(applyId, evaluation);
+        return applyManageService.writeEvaluation(applyId, evaluationReq);
     }
 
     /**
@@ -100,10 +102,9 @@ public class ApplyManageController {
      */
     @PutMapping("/apply/set_meeting/{applyId}")
     public ResponseEntity<?> setMeetDay(@PathVariable Long applyId,
-                                        @RequestParam(name = "interviewDate") String interviewDate,
-                                        @RequestParam(name = "interviewTime") String interviewTime) {
+                                        @RequestBody MeetingDateReq meetingDateReq) {
 
-        return applyManageService.setMeetDay(applyId, interviewDate, interviewTime);
+        return applyManageService.setMeetDay(applyId, meetingDateReq);
     }
 
     /**

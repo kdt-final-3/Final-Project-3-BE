@@ -1,9 +1,7 @@
 package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
-import com.finalproject.recruit.dto.applymanage.ApplyDetailResponseDTO;
-import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
-import com.finalproject.recruit.dto.applymanage.CountAndDateResponseDTO;
+import com.finalproject.recruit.dto.applymanage.*;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.exception.applyManage.ApplyManageException;
@@ -237,7 +235,7 @@ public class ApplyManageService {
                 result.setProcess("채용 시작 전");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getDocsStart().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("채용 시작까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else if (now.isAfter(findRecruit.getDocsStart()) && now.isBefore(findRecruit.getDocsEnd())) {
 
@@ -258,21 +256,21 @@ public class ApplyManageService {
                 result.setProcess("면접 진행 중");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getMeetEnd().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("면접전형 종료까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else if (now.isAfter(findRecruit.getMeetEnd()) && now.isBefore(findRecruit.getConfirmStart())) {
 
                 result.setProcess("면접 종료");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmStart().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("최종조율까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else if (now.isAfter(findRecruit.getConfirmStart()) && now.isBefore(findRecruit.getConfirmEnd())) {
 
                 result.setProcess("최종 조율 중");
 
                 Period diffDate = Period.between(now.toLocalDate(), findRecruit.getConfirmEnd().toLocalDate()); //날짜 차이 계산
-                result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "남았습니다.");
+                result.setProcessFinish("최종조율 마감까지 " + diffDate.getDays() + "일 남았습니다.");
 
             } else {
                 result.setProcess("채용마감");
@@ -311,14 +309,14 @@ public class ApplyManageService {
      * @return
      */
     @Transactional
-    public ResponseEntity<?> writeEvaluation(Long applyId, String evaluation) {
+    public ResponseEntity<?> writeEvaluation(Long applyId, EvaluationReq evaluationReq) {
         try {
 
             Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
                     () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
             );
 
-            findApply.writeEvaluation(evaluation);
+            findApply.writeEvaluation(evaluationReq.getEvaluation());
 
         } catch (ApplyManageException e) {
             e.printStackTrace();
@@ -386,15 +384,14 @@ public class ApplyManageService {
     /**
      * 인재 면접날짜 지정
      * @param applyId
-     * @param interviewDate
-     * @param interviewTime
+     * @param meetingDateReq
      * @return
      */
     @Transactional
-    public ResponseEntity<?> setMeetDay(Long applyId, String interviewDate, String interviewTime) {
+    public ResponseEntity<?> setMeetDay(Long applyId, MeetingDateReq meetingDateReq) {
         try {
 
-            String meeting = interviewDate + "T" + interviewTime;
+            String meeting = meetingDateReq.getInterviewDate() + "T" + meetingDateReq.getInterviewTime();
             LocalDateTime meetingDay = LocalDateTime.parse(meeting);
 
             Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
