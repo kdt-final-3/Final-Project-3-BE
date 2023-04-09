@@ -31,6 +31,7 @@ public class ApplyDetailResponseDTO {
     ApplyProcedure applyProcedure;
     String evaluation;
     Boolean pass;
+    Boolean failApply;
     LocalDateTime createdTime;
     LocalDateTime checkApply;
     LocalDateTime meeting;
@@ -78,6 +79,7 @@ public class ApplyDetailResponseDTO {
         this.applyProcedure = apply.getApplyProcedure();
         this.evaluation = apply.getEvaluation();
         this.pass = apply.isPass();
+        this.failApply = apply.isFailApply();
         this.createdTime = apply.getCreatedTime();
         this.checkApply = apply.getCheckApply();
         this.meeting = apply.getMeeting();

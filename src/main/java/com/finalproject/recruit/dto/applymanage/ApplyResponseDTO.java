@@ -22,6 +22,7 @@ public class ApplyResponseDTO {
     String applyEmail;
     ApplyProcedure applyProcedure;
     Boolean pass;
+    Boolean failApply;
     LocalDateTime createdTime;
     Boolean applyDelete;
     Boolean wish;
@@ -36,6 +37,7 @@ public class ApplyResponseDTO {
         this.applyEmail = apply.getApplyEmail();
         this.applyProcedure = apply.getApplyProcedure();
         this.pass = apply.isPass();
+        this.failApply = apply.isFailApply();
         this.createdTime = apply.getCreatedTime();
         this.applyDelete = apply.isApplyDelete();
         this.wish = apply.isWish();
