@@ -32,6 +32,9 @@ public class ApplyDetailResponseDTO {
     String evaluation;
     Boolean pass;
     LocalDateTime createdTime;
+    LocalDateTime checkApply;
+    LocalDateTime meeting;
+    LocalDateTime passDay;
     Boolean applyDelete;
     Boolean wish;
     String careerName;
@@ -56,6 +59,8 @@ public class ApplyDetailResponseDTO {
     String awardsName;
     LocalDateTime awardsDate;
     String awardsCompany;
+    String keywords;
+    List<String> keywordList;
 
     public ApplyDetailResponseDTO(Apply apply) {
         this.recruitId = apply.getRecruit().getRecruitId();
@@ -74,6 +79,9 @@ public class ApplyDetailResponseDTO {
         this.evaluation = apply.getEvaluation();
         this.pass = apply.isPass();
         this.createdTime = apply.getCreatedTime();
+        this.checkApply = apply.getCheckApply();
+        this.meeting = apply.getMeeting();
+        this.passDay = apply.getPassDay();
         this.applyDelete = apply.isApplyDelete();
         this.wish = apply.isWish();
         this.careerName = apply.getCareer().getCareerName();
@@ -98,5 +106,6 @@ public class ApplyDetailResponseDTO {
         this.awardsName = apply.getAwards().getAwardsName();
         this.awardsDate = apply.getAwards().getAwardsDate();
         this.awardsCompany = apply.getAwards().getAwardsCompany();
+        this.keywords = apply.getKeywordSelect();
     }
 }

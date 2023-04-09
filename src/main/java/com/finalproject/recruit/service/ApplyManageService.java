@@ -297,6 +297,10 @@ public class ApplyManageService {
                 () -> new ApplyManageException(ErrorCode.FAIL_CHECK_APPLICANT_DETAIL)
         );
 
+        //키워드를 배열로 저장해서 반환
+        List<String> applyKeywords = Arrays.asList(data.getKeywords().split(","));
+        data.setKeywordList(applyKeywords);
+
         return response.success(data);
     }
 
