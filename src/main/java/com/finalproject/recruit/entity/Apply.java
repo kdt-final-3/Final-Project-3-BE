@@ -108,12 +108,24 @@ public class Apply extends BaseTime {
     @Column(name = "wish")
     private boolean wish;
 
+    /**
+     * 서류검토날짜
+     */
     private LocalDateTime checkApply;
 
+    /**
+     * 면접날짜
+     */
     private LocalDateTime meeting;
 
+    /**
+     * 합격날짜
+     */
     private LocalDateTime passDay;
 
+    /**
+     * 탈락인재보관함
+     */
     @Column(name = "fail_apply")
     private boolean failApply;
 

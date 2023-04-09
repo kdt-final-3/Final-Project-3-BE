@@ -146,7 +146,7 @@ public class NoticeService {
             mailSend(recruit, applyEmails, message);
 
             // Sending History Archiving
-            archiveSendHistory(recruit, applyEmails, message, emailReq.getNoticeStep());
+            archiveSendHistory(recruit, emailReq.getApplyIds(), message, emailReq.getNoticeStep());
 
             return response.success("Successfully Sending Email");
 
@@ -192,9 +192,9 @@ public class NoticeService {
 
     // 이메일 전송내역 저장
     @Transactional
-    public void archiveSendHistory(Recruit recruit, List<String> applyEmails, String msg, NoticeStep step){
-        List<Apply> applies = applyEmails.stream()
-                .map(email -> applyRepository.findByApplyEmail(email).orElse(null))
+    public void archiveSendHistory(Recruit recruit, List<Long> applyIds, String msg, NoticeStep step){
+        List<Apply> applies = applyIds.stream()
+                .map(applyId -> applyRepository.findByApplyId(applyId).orElse(null))
                 .collect(Collectors.toList());
 
         // empty check
