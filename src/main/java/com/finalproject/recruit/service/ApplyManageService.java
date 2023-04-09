@@ -1,10 +1,7 @@
 package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
-import com.finalproject.recruit.dto.applymanage.ApplyDetailResponseDTO;
-import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
-import com.finalproject.recruit.dto.applymanage.CountAndDateResponseDTO;
-import com.finalproject.recruit.dto.applymanage.MeetingDateReq;
+import com.finalproject.recruit.dto.applymanage.*;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.exception.applyManage.ApplyManageException;
@@ -312,14 +309,14 @@ public class ApplyManageService {
      * @return
      */
     @Transactional
-    public ResponseEntity<?> writeEvaluation(Long applyId, String evaluation) {
+    public ResponseEntity<?> writeEvaluation(Long applyId, EvaluationReq evaluationReq) {
         try {
 
             Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
                     () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
             );
 
-            findApply.writeEvaluation(evaluation);
+            findApply.writeEvaluation(evaluationReq.getEvaluation());
 
         } catch (ApplyManageException e) {
             e.printStackTrace();
