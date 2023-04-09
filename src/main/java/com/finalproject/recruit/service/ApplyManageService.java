@@ -4,6 +4,7 @@ import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.applymanage.ApplyDetailResponseDTO;
 import com.finalproject.recruit.dto.applymanage.ApplyResponseDTO;
 import com.finalproject.recruit.dto.applymanage.CountAndDateResponseDTO;
+import com.finalproject.recruit.dto.applymanage.MeetingDateReq;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Recruit;
 import com.finalproject.recruit.exception.applyManage.ApplyManageException;
@@ -386,15 +387,14 @@ public class ApplyManageService {
     /**
      * 인재 면접날짜 지정
      * @param applyId
-     * @param interviewDate
-     * @param interviewTime
+     * @param meetingDateReq
      * @return
      */
     @Transactional
-    public ResponseEntity<?> setMeetDay(Long applyId, String interviewDate, String interviewTime) {
+    public ResponseEntity<?> setMeetDay(Long applyId, MeetingDateReq meetingDateReq) {
         try {
 
-            String meeting = interviewDate + "T" + interviewTime;
+            String meeting = meetingDateReq.getInterviewDate() + "T" + meetingDateReq.getInterviewTime();
             LocalDateTime meetingDay = LocalDateTime.parse(meeting);
 
             Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
