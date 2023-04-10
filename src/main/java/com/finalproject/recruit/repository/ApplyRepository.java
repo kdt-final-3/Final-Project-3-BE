@@ -18,9 +18,9 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     Page<Apply> findByRecruitRecruitIdAndFailApplyIsTrue(Long recruitId, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"career","education","language","certificate","activities","awards"})
     Page<Apply> findByApplyNameAndRecruitRecruitIdAndFailApplyIsTrue(String applyName, Long recruitId, Pageable pageable);
 
-    List<Apply> findByRecruitRecruitId(Long recruitId);
 
     Page<Apply> findByRecruitRecruitId(Long recruitId, Pageable pageable);
 
@@ -29,9 +29,9 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
     Page<Apply> findByRecruitRecruitIdAndApplyDeleteIsTrue(Long recruitId, Pageable pageable);
 
     boolean existsApplyByApplyEmailAndRecruitRecruitId(String email,Long recruitId);
+    
 
-    Optional<Apply> findByApplyEmail(String email);
-
+    @EntityGraph(attributePaths = {"career","education","language","military","certificate","activities","awards"})
     List<Apply> findByApplyNameAndRecruitRecruitId(String applyName, Long recruitId);
 
     @EntityGraph(attributePaths = {"career","education","language","military","certificate","activities","awards"})
