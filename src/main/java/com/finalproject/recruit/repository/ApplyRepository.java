@@ -52,4 +52,12 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
     @Modifying
     @Query("update Apply a set a.applyProcedure = :applyProcedure where a.applyId IN (:applyIds)")
     void updateApplicantProcedure(@Param("applyProcedure") ApplyProcedure applyProcedure, @Param("applyIds") List<Long> applyIds);
+
+    @Modifying
+    @Query("update Apply a set a.failApply = true where a.applyId IN (:applyIds)")
+    void updateApplicantsDrop(@Param("applyIds") List<Long> applyIds);
+
+    @Modifying
+    @Query("update Apply a set a.failApply = false where a.applyId IN (:applyIds)")
+    void updateApplicantsDropCancel(@Param("applyIds") List<Long> applyIds);
 }

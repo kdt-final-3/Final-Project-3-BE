@@ -377,6 +377,28 @@ public class ApplyManageService {
     }
 
     /**
+     * 탈락인재 보관함 이동 (일괄처리)
+     * @param applyIdsReq
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> dropApplicants(ApplyIdsReq applyIdsReq) {
+        try {
+
+            applyRepository.updateApplicantsDrop(applyIdsReq.getApplyIds());
+
+        } catch (ApplyManageException e) {
+            return response.fail(
+                    ErrorCode.FAIL_DROP_APPLICANT.getMessage(),
+                    ErrorCode.FAIL_DROP_APPLICANT.getStatus()
+            );
+        }
+
+        return response.success("Success to Move Applicants in DropBox!");
+    }
+
+
+    /**
      * 인재 면접날짜 지정
      * @param applyId
      * @param meetingDateReq

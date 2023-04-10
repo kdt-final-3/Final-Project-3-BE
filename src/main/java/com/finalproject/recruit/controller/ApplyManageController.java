@@ -1,5 +1,6 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.applymanage.ApplyIdsReq;
 import com.finalproject.recruit.dto.applymanage.ApplyProcedureReq;
 import com.finalproject.recruit.dto.applymanage.EvaluationReq;
 import com.finalproject.recruit.dto.applymanage.MeetingDateReq;
@@ -89,12 +90,21 @@ public class ApplyManageController {
     }
 
     /**
-     * 지원자 탈락인재 보관함 이동
+     * 지원자 탈락인재 보관함 등록 / 해제
      */
     @PutMapping("/apply/drop/{applyId}")
     public ResponseEntity<?> dropApply(@PathVariable Long applyId) {
 
         return applyManageService.dropApply(applyId);
+    }
+
+    /**
+     * 지원자 탈락인재 보관함 일괄 등록 (선택된 지원자만)
+     */
+    @PutMapping("/apply/drop")
+    public ResponseEntity<?> dropApplicants(@RequestBody ApplyIdsReq applyIdsReq) {
+
+        return applyManageService.dropApplicants(applyIdsReq);
     }
 
     /**
