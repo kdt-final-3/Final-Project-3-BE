@@ -16,12 +16,13 @@ import java.util.Optional;
 
 public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
+
     Page<Apply> findByRecruitRecruitIdAndFailApplyIsTrue(Long recruitId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"career","education","language","certificate","activities","awards"})
     Page<Apply> findByApplyNameAndRecruitRecruitIdAndFailApplyIsTrue(String applyName, Long recruitId, Pageable pageable);
 
-
+    @EntityGraph(attributePaths = {"career","education","language","certificate","activities","awards"})
     Page<Apply> findByRecruitRecruitId(Long recruitId, Pageable pageable);
 
     Optional<Apply> findByApplyId(Long applyId);
