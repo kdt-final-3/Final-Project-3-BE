@@ -131,7 +131,7 @@ public class ApplyManageService {
             dto.setScore(score);                //가점 반환
             dto.setKeywordList(applyKeywords);  //키워드 배열 반환
 
-        }catch(ApplyManageException e){
+        }catch(Exception e){
             e.printStackTrace();
             throw new ApplyManageException(
                     ErrorCode.KEYWORD_SCORE_CALCULATION_FAILED,
