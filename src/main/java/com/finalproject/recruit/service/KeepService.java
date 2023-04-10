@@ -1,6 +1,7 @@
 package com.finalproject.recruit.service;
 
 import com.finalproject.recruit.dto.Response;
+import com.finalproject.recruit.dto.applymanage.ApplyIdsReq;
 import com.finalproject.recruit.dto.keep.ApplicantsRes;
 import com.finalproject.recruit.entity.Apply;
 import com.finalproject.recruit.entity.Mail;
@@ -141,5 +142,25 @@ public class KeepService {
                 applicantsResList,
                 "Successfully Get Deleted Applicants List"
         );
+    }
+
+    /*===========================
+        탈락인재 보관 해제 일괄처리
+        (선택된 지원자만)
+    ===========================*/
+    @Transactional
+    public ResponseEntity<?> dropCancelApplicants(ApplyIdsReq applyIdsReq) {
+        try {
+
+            applyRepository.updateApplicantsDropCancel(applyIdsReq.getApplyIds());
+
+        } catch (KeepException e) {
+            return response.fail(
+                    ErrorCode.FAIL_CANCEL_DROP_APPLICANTS.getMessage(),
+                    ErrorCode.FAIL_CANCEL_DROP_APPLICANTS.getStatus()
+            );
+        }
+
+        return response.success("Success to Cancel Applicants in DropBox!");
     }
 }

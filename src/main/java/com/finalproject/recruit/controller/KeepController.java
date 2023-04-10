@@ -1,5 +1,6 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.applymanage.ApplyIdsReq;
 import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.service.KeepService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,15 @@ public class KeepController {
     @GetMapping("/view-applicant/eternal/{recruitId}")
     public ResponseEntity<?> eternalDeleteApplicants(@PathVariable Long recruitId, Pageable pageable){
         return keepService.eternalDeleteApplicants(recruitId, pageable);
+    }
+
+    /**
+     * 지원자 탈락인재 보관함 일괄 해제 (선택된 지원자만)
+     */
+    @PutMapping("/cancel")
+    public ResponseEntity<?> dropCancelApplicants(@RequestBody ApplyIdsReq applyIdsReq) {
+
+        return keepService.dropCancelApplicants(applyIdsReq);
     }
 
     @GetMapping("/view-applicant/search")
