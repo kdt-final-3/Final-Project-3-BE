@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -47,4 +48,8 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 
     @EntityGraph(attributePaths = {"career","education","language","military","certificate","activities","awards"})
     Optional<Apply> findJoinByApplyId(Long applyId);
+
+    @Modifying
+    @Query("update Apply a set a.applyProcedure = :applyProcedure where a.applyId IN (:applyIds)")
+    void updateApplicantProcedure(@Param("applyProcedure") ApplyProcedure applyProcedure, @Param("applyIds") List<Long> applyIds);
 }

@@ -1,5 +1,6 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.applymanage.ApplyProcedureReq;
 import com.finalproject.recruit.dto.applymanage.EvaluationReq;
 import com.finalproject.recruit.dto.applymanage.MeetingDateReq;
 import com.finalproject.recruit.service.ApplyManageService;
@@ -35,11 +36,10 @@ public class ApplyManageController {
     /**
      * 지원자 채용단계 변경
      */
-    @PutMapping("/manage/change/{applyId}/{procedure}")
-    public ResponseEntity<?> changeApplyProcedure(@PathVariable Long applyId,
-                                                  @PathVariable String procedure) {
+    @PutMapping("/manage/change_procedure")
+    public ResponseEntity<?> changeApplyProcedure(@RequestBody ApplyProcedureReq applyProcedureReq) {
 
-        return applyManageService.changeApplyProcedure(applyId, procedure);
+        return applyManageService.changeApplyProcedure(applyProcedureReq);
     }
 
     /**

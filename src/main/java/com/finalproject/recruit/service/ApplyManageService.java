@@ -158,20 +158,15 @@ public class ApplyManageService {
 
     /**
      * 지원자 채용단계 수정
-     * @param applyId
-     * @param procedure
+     * @param applyProcedureReq
      * @return
      */
     @Transactional
-    public ResponseEntity<?> changeApplyProcedure(Long applyId, String procedure) {
+    public ResponseEntity<?> changeApplyProcedure(ApplyProcedureReq applyProcedureReq) {
         try {
 
-            ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, procedure);
-
-            Apply findApply = applyRepository.findJoinByApplyId(applyId).orElseThrow(
-                    () -> new ApplyManageException(ErrorCode.APPLICANTS_NOT_FOUND)
-            );
-            findApply.changeProcedure(applyProcedure);
+            ApplyProcedure applyProcedure = Enum.valueOf(ApplyProcedure.class, applyProcedureReq.getProcedure());
+            applyRepository.updateApplicantProcedure(applyProcedure, applyProcedureReq.getApplyIds());
 
         } catch (ApplyManageException e) {
             e.printStackTrace();
@@ -305,7 +300,7 @@ public class ApplyManageService {
     /**
      * 지원자 코멘트 등록
      * @param applyId
-     * @param evaluation
+     * @param evaluationReq
      * @return
      */
     @Transactional
