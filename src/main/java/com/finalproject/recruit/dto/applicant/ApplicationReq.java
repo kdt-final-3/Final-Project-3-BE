@@ -89,7 +89,7 @@ public class ApplicationReq {
                         .veteran(veteran)
                         .employment(employment)
                         .terms(terms)
-                        .militaryEnum(militaryEnum)
+                        .military(militaryEnum)
                         .build();
         }
 

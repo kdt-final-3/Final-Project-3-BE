@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CertificateResponseDTO {
+public class CertificateResponseDTO { //지원서 엔티티와 자격증 엔티티를 1대다로 변경 시에 확장 위한 DTO
 
     String certificateName;
     LocalDateTime certificateDate;

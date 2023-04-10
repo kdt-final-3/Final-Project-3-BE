@@ -73,7 +73,7 @@ public class ApplyDetailResponseDTO {
         this.veteran = apply.isVeteran();
         this.employment = apply.isEmployment();
         this.terms = apply.isTerms();
-        this.militaryEnum = apply.getMilitaryEnum();
+        this.militaryEnum = apply.getMilitary();
         this.applyPortfolio = apply.getApplyPortfolio();
         this.applyResume = apply.getApplyResume();
         this.applyProcedure = apply.getApplyProcedure();

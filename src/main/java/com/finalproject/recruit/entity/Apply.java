@@ -144,11 +144,6 @@ public class Apply extends BaseTime {
     private boolean employment;
 
     /**
-     * 병역
-     */
-    private MilitaryEnum militaryEnum;
-
-    /**
      * 약관
      * */
     private boolean terms;
