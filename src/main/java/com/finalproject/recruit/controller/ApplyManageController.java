@@ -44,6 +44,15 @@ public class ApplyManageController {
     }
 
     /**
+     * 지원자 탈락인재 보관함 일괄 등록 (선택된 지원자만)
+     */
+    @PutMapping("/manage/drop")
+    public ResponseEntity<?> dropApplicants(@RequestBody ApplyIdsReq applyIdsReq) {
+
+        return applyManageService.dropApplicants(applyIdsReq);
+    }
+
+    /**
      * 지원자 합격 / 불합격 처리
      */
     @PutMapping("/manage/pass/{applyId}")
@@ -96,15 +105,6 @@ public class ApplyManageController {
     public ResponseEntity<?> dropApply(@PathVariable Long applyId) {
 
         return applyManageService.dropApply(applyId);
-    }
-
-    /**
-     * 지원자 탈락인재 보관함 일괄 등록 (선택된 지원자만)
-     */
-    @PutMapping("/apply/drop")
-    public ResponseEntity<?> dropApplicants(@RequestBody ApplyIdsReq applyIdsReq) {
-
-        return applyManageService.dropApplicants(applyIdsReq);
     }
 
     /**
