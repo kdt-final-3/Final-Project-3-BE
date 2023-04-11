@@ -10,7 +10,7 @@
 - **한줄 소개 :** 채용관리 서비스
 - **테이블 명세서 & ERD :** [테이블 명세서 & ERD](https://www.erdcloud.com/d/zf9iDizMrS2riH2BJ)
 - **API명세서 :** [API 명세서](https://documenter.getpostman.com/view/24197090/2s93K1qzkt#intro)
-<div><h1> 👨‍👨‍1. 팀원 소개 </h1></div>
+<div><h1> 1. 팀원 소개 </h1></div>
 <div align = center> 
 <table border = 1>
   <th>오태경</th>
@@ -35,6 +35,7 @@
   </tr>
 </table>
 </div>
+<br>
 <div> <h1> 2. 프로젝트 소개 </h1> </div>
 
   
@@ -60,21 +61,22 @@
 |첫화면 및 로그인 페이지|회원가입 페이지|
 |:---:|:---:|
 |<img width="100%" alt="첫 화면 gif" src="https://user-images.githubusercontent.com/113500789/231084886-abdac5a5-6b54-4c6b-a106-4f571e280fc4.gif"/>|<img width="100%" alt="로그인 gif" src="https://user-images.githubusercontent.com/113500789/231083483-3acfdbb4-f551-4700-997c-2d3119dc3204.gif"/>|
-|내용| 내용|
+|로그인은 이메일과 비밀번호로 진행하며,<br> 로그인 성공 시 Access Token과 Refresh Token을 발급합니다. | 회원가입은 이메일 인증을 먼저 진행하고 <br> 인증 후에 다른 필수 정보를 입력하여 진행합니다.|
 |**인재 관리**|**채용폼 작성**|
 |<img width="100%" alt="마이 룸 생성 gif" src="https://user-images.githubusercontent.com/113500789/231083985-71da428c-ab08-401c-9686-f28bfceb9cac.gif"/>|<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084103-be1057cd-8017-41f6-8400-f6da0b9bcf71.gif"/>|
-|내용|내용|
+|인재관리 페이지에서는 현재 채용 공고에 대한<br> 지원현황을 조회할 수 있습니다.|기업은 여러 항목 중 채용 공고에<br> 적용시킬 항목을 선정할 수 있습니다.|
 |**지원서 작성**|**추천 인재**|
 |<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084187-acaeea89-bd53-4df6-a637-840451cf1b90.gif"/>|<img width="100%" src="https://user-images.githubusercontent.com/113500789/231089561-97ffc9b0-ad45-46f7-a7a9-5b050cbca405.gif"/>|
-|내용|내용|
+|지원서는 기업이 선정한 자기소개서 항목과 같은 내용을 <br> 지원자에게 작성하게 합니다.|FE로부터 전달받은 키워드를 ","로 구분하여 분리하고 <br> 이를 기업이 선정한 키워드와 비교하여 가점을 주어 리턴합니다.|
 |**채용 단계 수정**|**인재 상세 페이지**|
 |<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084352-f4703130-8f56-4599-af19-a8b0baa6b8ec.gif"/>|<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084418-4b5da0bf-931c-46c8-b589-4b9f1e1a8bb9.gif"/>|
-|내용|내용|
+|현재 채용 공고에 지원한 인재 리스트 중 <br> 채용 단계를 변경시킬 수 있습니다.|인재 상세 페이지에서는 지원자의 <br> 채용 타임라인을 변경할 수 있습니다.|
 |**알림 센터 메시지 보내기**|
 |<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084465-0efefd8d-e0eb-48ae-bc48-2a422bc68f68.gif"/>|
-|내용|
+|Gmail API를 통하여 메일링 서비스를 구현,<br> 지원자들에게 채용에 관한 정보를 보내는 API를 구현하였습니다.|
+<br>
+<div><h1> 3. 기술 스택 </h1></div>
 
-## 🔧 Skills
 
 | Git | Github | Slack |
 | :---: | :---: | :---: |
