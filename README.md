@@ -1,6 +1,6 @@
  <h1>📚 인재는 두 배로, 채용시간은 절반으로! Jobkok</h1>
 <div  align="center">
-  <img width="40%" src="https://user-images.githubusercontent.com/113500789/231082566-b8dc6797-5daf-49cb-b072-a9e67216318e.jpg" alt="roobits">
+  <img width="100%" src="https://user-images.githubusercontent.com/113500789/231099337-c474d231-b579-4dd1-8fc5-fa3c11009740.png" alt="roobits">
 </div>
 </br>
 
