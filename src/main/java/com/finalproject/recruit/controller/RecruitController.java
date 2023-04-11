@@ -44,8 +44,18 @@ public class RecruitController {
         채용폼 상세조회
     ===========================*/
     @GetMapping("/{recruit_id}")
-    public ResponseEntity<?> detailRecruit(@PathVariable Long recruit_id){
-        return recruitService.selectRecruitDetail(recruit_id);
+    public ResponseEntity<?> detailRecruit(@PathVariable Long recruit_id,
+                                           Authentication authentication){
+        AuthDTO memberInfo = (AuthDTO) authentication.getPrincipal();
+        return recruitService.selectRecruitDetail(memberInfo.getMemberEmail(), recruit_id);
+    }
+
+    /*===========================
+        채용폼 상세조회 Redis
+    ===========================*/
+    @GetMapping("/recent/{memberEmail}")
+    public ResponseEntity<?> findRecentRecruit(@PathVariable String memberEmail){
+        return recruitService.findRecentRecruit(memberEmail);
     }
 
 
