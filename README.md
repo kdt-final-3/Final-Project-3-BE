@@ -60,19 +60,19 @@
 |첫화면 및 로그인 페이지|회원가입 페이지|
 |:---:|:---:|
 |<img width="100%" alt="첫 화면 gif" src="https://user-images.githubusercontent.com/113500789/231084886-abdac5a5-6b54-4c6b-a106-4f571e280fc4.gif"/>|<img width="100%" alt="로그인 gif" src="https://user-images.githubusercontent.com/113500789/231083483-3acfdbb4-f551-4700-997c-2d3119dc3204.gif"/>|
-|- 검색<br/>- 로그인<br/>- 회원가입<br/>- 로그아웃<br/>- 책 등록<br/>- 내 책장<br/>- 마이페이지| 자체 회원가입으로 다음과 같이 구현<br/>- email input<br/>- 지역 input<br/>- nickname input<br/>- password input<br/>- sign-up 버튼<br/>- email input<br/>- password input<br/>- login 버튼|
+|내용| 내용|
 |**인재 관리**|**채용폼 작성**|
 |<img width="100%" alt="마이 룸 생성 gif" src="https://user-images.githubusercontent.com/113500789/231083985-71da428c-ab08-401c-9686-f28bfceb9cac.gif"/>|<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084103-be1057cd-8017-41f6-8400-f6da0b9bcf71.gif"/>|
-|책 키워드 검색 → 키워드가 들어간 책들 목록 →유저 등록한 책 목록 → 유저가 클릭한 책 상세페이지를 통한 검색 구현<br/>- 책 키워드 검색창<br/>- 키워드가 들어간 책 리스트<br/>- 유저가 등록한 책 리스트<br/>- 클릭된 책 상세페이지 이동 <br/>책 한줄평 작성, 조회, 수정, |-책 검색 API<br/>- 책 등급 선택|
+|내용|내용|
 |**지원서 작성**|**추천 인재**|
 |<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084187-acaeea89-bd53-4df6-a637-840451cf1b90.gif"/>|<img width="100%" src="https://user-images.githubusercontent.com/113500789/231089561-97ffc9b0-ad45-46f7-a7a9-5b050cbca405.gif"/>|
-|-책 수정|- 책 정보<br/>- 등록한 유저 정보<br/>- 등록한 유저가 등록한 책<br/>- 교환 요청: 쪽지 보내기|
+|내용|내용|
 |**채용 단계 수정**|**인재 상세 페이지**|
 |<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084352-f4703130-8f56-4599-af19-a8b0baa6b8ec.gif"/>|<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084418-4b5da0bf-931c-46c8-b589-4b9f1e1a8bb9.gif"/>|
-|- 주기적으로 새 메세지 조회<br/>- 알림버튼을 클릭해 쪽지 페이지 진입<br/>- 쪽지페이지에서 쪽지 개별 페이지 진입|-받은메세지, 보낸 메세지 조회, 삭제|
+|내용|내용|
 |**알림 센터 메시지 보내기**|
 |<img width="100%" src="https://user-images.githubusercontent.com/113500789/231084465-0efefd8d-e0eb-48ae-bc48-2a422bc68f68.gif"/>|
-|- 책 등록, 조회, 수정, 삭제|
+|내용|
 
 ## 🔧 Skills
 
