@@ -18,5 +18,6 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
         탈락인재 & 알람 & 지원자
     ===========================*/
     Optional<Recruit> findTopByAndMemberMemberEmailOrderByRecruitRegistedAt(String email);
+    Optional<Recruit> findTopByMember_MemberEmailOrderByRecruitRegistedAt(String memberEmail);
     List<Recruit> findByMemberMemberEmail(String memberEmail);
 }
