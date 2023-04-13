@@ -1,7 +1,9 @@
 package com.finalproject.recruit.controller;
 
+import com.finalproject.recruit.dto.Response;
 import com.finalproject.recruit.dto.member.AuthDTO;
 import com.finalproject.recruit.dto.recruit.RecruitReq;
+import com.finalproject.recruit.dto.recruit.RecruitRes;
 import com.finalproject.recruit.service.RecruitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class RecruitController {
     private final RecruitService recruitService;
+
+    private final Response response;
 
     /*===========================
         채용폼 목록조회
@@ -51,6 +55,17 @@ public class RecruitController {
     }
 
     /*===========================
+      채용폼 상세조회 캐싱 추가
+  ===========================*/
+    @GetMapping("/cache/{recruit_id}")
+    public ResponseEntity<?> detailRecruitCache(@PathVariable Long recruit_id,
+                                           Authentication authentication){
+        AuthDTO memberInfo = (AuthDTO) authentication.getPrincipal();
+        RecruitRes recruitRes = recruitService.selectRecruitDetailCache(memberInfo.getMemberEmail(), recruit_id);
+        return response.success(recruitRes);
+    }
+
+    /*===========================
         채용폼 상세조회 Redis
     ===========================*/
     @GetMapping("/recent/{memberEmail}")
@@ -65,6 +80,15 @@ public class RecruitController {
     @PutMapping("/{recruit_id}")
     public ResponseEntity<?> editRecruit(@RequestBody RecruitReq req, @PathVariable Long recruit_id){
         return recruitService.editRecruit(req, recruit_id);
+    }
+
+    /*===========================
+      채용폼 수정 : 캐싱 사용
+  ===========================*/
+    @PutMapping("/cache/{recruit_id}")
+    public ResponseEntity<?> editRecruitCache(@RequestBody RecruitReq req, @PathVariable Long recruit_id){
+        RecruitRes recruitRes = recruitService.editRecruitCache(req, recruit_id);
+        return response.success(recruitRes);
     }
 
     /*===========================

@@ -1,6 +1,5 @@
 package com.finalproject.recruit.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -10,17 +9,14 @@ import com.finalproject.recruit.dto.recruit.RecruitReq;
 import com.finalproject.recruit.dto.recruit.RecruitRes;
 import com.finalproject.recruit.entity.Member;
 import com.finalproject.recruit.entity.Recruit;
-import com.finalproject.recruit.exception.keep.KeepException;
-import com.finalproject.recruit.exception.member.MemberException;
 import com.finalproject.recruit.exception.recruit.ErrorCode;
 import com.finalproject.recruit.exception.recruit.RecruitException;
 import com.finalproject.recruit.parameter.Procedure;
 import com.finalproject.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +26,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -114,10 +109,67 @@ public class RecruitService {
         }
     }
 
+    @Cacheable(value="recruitDetail", key="#recruitId", cacheManager = "RedisCacheManager")
+    public RecruitRes selectRecruitDetailCache(String memberEmail, Long recruitId) {
+        try {
+            Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Requested RecruitFrom %d Not Found", recruitId)));
+            // 채용기간 기반, 채용상태 조정
+            recruit.adjustProcedure();
+
+            // 채용상태가 변경된 값을 출력
+            RecruitRes recruitRes = new RecruitRes(recruitRepository.save(recruit));
+
+            //레디스에 가장 최근 본 채용폼으로 저장
+            saveRecentRecruit(memberEmail, recruitRes);
+
+            return recruitRes;
+
+        } catch (RecruitException e) {
+            e.printStackTrace();
+            throw new RecruitException(ErrorCode.UNABLE_TO_GET_RECRUITFORM);
+        }
+    }
+
+    /*===========================
+           채용폼 수정 : 캐싱
+    ===========================*/
+    @Transactional
+    @CachePut(value = "recruitDetail", key = "#recruitId", cacheManager = "RedisCacheManager")
+    public RecruitRes editRecruitCache(RecruitReq req, Long recruitId) {
+        // 기존에 등록된 Recruit 정보추출
+        try {
+            Recruit recruit = recruitRepository.findByRecruitId(recruitId).orElseThrow(
+                    () -> new RecruitException(
+                            ErrorCode.RECRUIT_FORM_NOT_FOUND,
+                            String.format("Requested RecruitFrom %d Not Found", recruitId)
+                    ));
+            // 입력된 정보로 Entity 수정
+            recruit.updateEntity(req);
+            // 단계날짜 변경시, 채용상태 재설정
+            recruit.adjustProcedure();
+
+            // 수정된 내용 DB 저장
+            RecruitRes recruitRes = new RecruitRes(recruitRepository.save(recruit));
+
+            // 수정된 내용 Redis에 저장
+            saveRecentRecruit(recruit.getMember().getMemberEmail(),recruitRes);
+
+            // DB에 저장된 내용전달
+            return recruitRes;
+
+        } catch (RecruitException e) {
+            e.printStackTrace();
+            throw new RecruitException(ErrorCode.FAIL_TO_EDIT_RECRUITFORM);
+        }
+    }
     /*===========================
         채용폼 수정
     ===========================*/
     @Transactional
+    @CachePut(value = "recruitDetail", key = "#recruitId", cacheManager = "RedisCacheManager")
     public ResponseEntity<?> editRecruit(RecruitReq req, Long recruitId) {
         // 기존에 등록된 Recruit 정보추출
         try {
@@ -283,4 +335,6 @@ public class RecruitService {
             recruitRes.setProcedure(Procedure.CLOSED.name());
         }
     }
+
+
 }
